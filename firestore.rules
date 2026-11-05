@@ -1,0 +1,105 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'kkh040403@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidPhoto(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 120 &&
+             data.category is string && data.category.size() > 0 && data.category.size() <= 50 &&
+             data.imageUrl is string && data.imageUrl.size() > 0 && data.imageUrl.size() <= 2048 &&
+             data.creationDate is string && data.creationDate.size() > 0 && data.creationDate.size() <= 30 &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
+             (!('thumbnailUrl' in data) || (data.thumbnailUrl is string && data.thumbnailUrl.size() <= 2048)) &&
+             (!('camera' in data) || (data.camera is string && data.camera.size() <= 100)) &&
+             (!('lens' in data) || (data.lens is string && data.lens.size() <= 100)) &&
+             (!('archiveCode' in data) || (data.archiveCode is string && data.archiveCode.size() <= 30)) &&
+             (!('isFeatured' in data) || (data.isFeatured is bool)) &&
+             (!('order' in data) || (data.order is number)) &&
+             (!('createdBy' in data) || (data.createdBy is string && data.createdBy.size() <= 128));
+    }
+
+    function isValidVideo(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 120 &&
+             data.category is string && data.category.size() > 0 && data.category.size() <= 50 &&
+             data.videoUrl is string && data.videoUrl.size() > 0 && data.videoUrl.size() <= 2048 &&
+             data.thumbnailUrl is string && data.thumbnailUrl.size() > 0 && data.thumbnailUrl.size() <= 2048 &&
+             data.creationDate is string && data.creationDate.size() > 0 && data.creationDate.size() <= 30 &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
+             (!('duration' in data) || (data.duration is string && data.duration.size() <= 20)) &&
+             (!('resolution' in data) || (data.resolution is string && data.resolution.size() <= 30)) &&
+             (!('client' in data) || (data.client is string && data.client.size() <= 100)) &&
+             (!('archiveCode' in data) || (data.archiveCode is string && data.archiveCode.size() <= 30)) &&
+             (!('isFeatured' in data) || (data.isFeatured is bool)) &&
+             (!('order' in data) || (data.order is number)) &&
+             (!('createdBy' in data) || (data.createdBy is string && data.createdBy.size() <= 128));
+    }
+
+    function isValidProfile(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.email is string && data.email.size() > 0 && data.email.size() <= 150 &&
+             data.bio is string && data.bio.size() <= 3000 &&
+             (!('title' in data) || (data.title is string && data.title.size() <= 150)) &&
+             (!('location' in data) || (data.location is string && data.location.size() <= 100)) &&
+             (!('disciplines' in data) || (data.disciplines is string && data.disciplines.size() <= 500)) &&
+             (!('software' in data) || (data.software is string && data.software.size() <= 500)) &&
+             (!('exhibitions' in data) || (data.exhibitions is string && data.exhibitions.size() <= 1500));
+    }
+
+    // Photo works collection
+    match /photos/{photoId} {
+      allow read: if true;
+      allow create: if isValidId(photoId) && isAdmin() && isValidPhoto(incoming());
+      allow update: if isValidId(photoId) && isAdmin() && isValidPhoto(incoming());
+      allow delete: if isValidId(photoId) && isAdmin();
+    }
+
+    // Video works collection
+    match /videos/{videoId} {
+      allow read: if true;
+      allow create: if isValidId(videoId) && isAdmin() && isValidVideo(incoming());
+      allow update: if isValidId(videoId) && isAdmin() && isValidVideo(incoming());
+      allow delete: if isValidId(videoId) && isAdmin();
+    }
+
+    // Profile & Settings
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create, update: if isValidId(settingId) && isAdmin() && isValidProfile(incoming());
+      allow delete: if isValidId(settingId) && isAdmin();
+    }
+
+    // Admin records
+    match /admins/{adminId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+  }
+}

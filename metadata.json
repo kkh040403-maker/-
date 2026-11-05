@@ -1,0 +1,6 @@
+{
+  "name": "DARK ARCHIVE | Portfolio",
+  "description": "Minimalist dark-themed personal portfolio and digital archive for photography and cinematography.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

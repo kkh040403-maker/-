@@ -1,0 +1,94 @@
+{
+  "entities": {
+    "Photo": {
+      "title": "Photo Work",
+      "description": "Represents a photographic artwork or project in the archive.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 120, "description": "Title of the photograph" },
+        "description": { "type": "string", "maxLength": 2000, "description": "Story and details of the photograph" },
+        "category": { "type": "string", "maxLength": 50, "description": "Category such as Architecture, Street, Portrait, Editorial" },
+        "imageUrl": { "type": "string", "maxLength": 2048, "description": "High resolution image URL" },
+        "thumbnailUrl": { "type": "string", "maxLength": 2048, "description": "Thumbnail preview URL" },
+        "creationDate": { "type": "string", "maxLength": 30, "description": "Date or year created" },
+        "camera": { "type": "string", "maxLength": 100, "description": "Camera model" },
+        "lens": { "type": "string", "maxLength": 100, "description": "Lens specification" },
+        "archiveCode": { "type": "string", "maxLength": 30, "description": "Catalog archive code" },
+        "isFeatured": { "type": "boolean", "description": "Whether featured on the home visual hero or recent highlights" },
+        "order": { "type": "number", "description": "Display order index" },
+        "createdBy": { "type": "string", "maxLength": 128, "description": "Admin UID who created the record" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp of last update" }
+      },
+      "required": ["title", "category", "imageUrl", "creationDate"]
+    },
+    "Video": {
+      "title": "Video Work",
+      "description": "Represents a film, commercial, music video, or motion piece in the archive.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 120, "description": "Title of the video work" },
+        "description": { "type": "string", "maxLength": 2000, "description": "Synopsis and production details" },
+        "category": { "type": "string", "maxLength": 50, "description": "Category such as Commercial, Cinematic, Short Film, Music Video" },
+        "videoUrl": { "type": "string", "maxLength": 2048, "description": "Direct MP4/WebM URL or embedded streaming URL" },
+        "thumbnailUrl": { "type": "string", "maxLength": 2048, "description": "Thumbnail poster image URL" },
+        "creationDate": { "type": "string", "maxLength": 30, "description": "Date or year created" },
+        "duration": { "type": "string", "maxLength": 20, "description": "Duration string such as 02:45" },
+        "resolution": { "type": "string", "maxLength": 30, "description": "Resolution specification e.g. 4K UHD" },
+        "client": { "type": "string", "maxLength": 100, "description": "Client or production entity" },
+        "archiveCode": { "type": "string", "maxLength": 30, "description": "Catalog archive code" },
+        "isFeatured": { "type": "boolean", "description": "Whether featured on the home visual hero or highlights" },
+        "order": { "type": "number", "description": "Display order index" },
+        "createdBy": { "type": "string", "maxLength": 128, "description": "Admin UID who created the record" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp of last update" }
+      },
+      "required": ["title", "category", "videoUrl", "thumbnailUrl", "creationDate"]
+    },
+    "Profile": {
+      "title": "Archivist Profile",
+      "description": "About section profile info, skills, tools, and contact info.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100, "description": "Artist name" },
+        "title": { "type": "string", "maxLength": 150, "description": "Artist title or role description" },
+        "bio": { "type": "string", "maxLength": 3000, "description": "About statement / introduction" },
+        "email": { "type": "string", "maxLength": 150, "description": "Contact email address" },
+        "location": { "type": "string", "maxLength": 100, "description": "Base location / studio location" },
+        "disciplines": { "type": "string", "maxLength": 500, "description": "Comma separated disciplines or work fields" },
+        "software": { "type": "string", "maxLength": 500, "description": "Tools and software used" },
+        "exhibitions": { "type": "string", "maxLength": 1500, "description": "Notable projects or exhibitions" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Timestamp of last update" }
+      },
+      "required": ["name", "email", "bio"]
+    },
+    "Admin": {
+      "title": "Admin Role",
+      "description": "Designates administrator privileges for user accounts.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 150, "description": "Admin email address" },
+        "grantedAt": { "type": "string", "format": "date-time", "description": "Timestamp of role grant" }
+      },
+      "required": ["email"]
+    }
+  },
+  "firestore": {
+    "/photos/{photoId}": {
+      "schema": "Photo",
+      "description": "Collection of all photographic works in the portfolio archive."
+    },
+    "/videos/{videoId}": {
+      "schema": "Video",
+      "description": "Collection of all video works in the portfolio archive."
+    },
+    "/settings/profile": {
+      "schema": "Profile",
+      "description": "Singleton configuration for the About profile and contact information."
+    },
+    "/admins/{adminId}": {
+      "schema": "Admin",
+      "description": "Collection of administrative users allowed to modify the archive."
+    }
+  }
+}
