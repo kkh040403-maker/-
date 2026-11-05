@@ -7,7 +7,6 @@ import {
   setDoc,
   deleteDoc,
   updateDoc,
-  onSnapshot,
 } from 'firebase/firestore';
 import {
   signInWithPopup,
@@ -35,50 +34,57 @@ const LOCAL_STORAGE_ADMIN_SESSION_KEY = 'dark_archive_admin_session';
 export function useArchiveStore() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
-    return localStorage.getItem(LOCAL_STORAGE_ADMIN_SESSION_KEY) === 'true';
-  });
-  const [photos, setPhotos] = useState<PhotoItem[]>([]);
-  const [videos, setVideos] = useState<VideoItem[]>([]);
-  const [profile, setProfile] = useState<ProfileData>(INITIAL_PROFILE);
-  const [loading, setLoading] = useState(true);
-  const [syncStatus, setSyncStatus] = useState<'synced' | 'local' | 'syncing'>('syncing');
-
-  // Load from local storage helper
-  const loadLocalData = useCallback(() => {
     try {
-      const storedPhotos = localStorage.getItem(LOCAL_STORAGE_PHOTOS_KEY);
-      const storedVideos = localStorage.getItem(LOCAL_STORAGE_VIDEOS_KEY);
-      const storedProfile = localStorage.getItem(LOCAL_STORAGE_PROFILE_KEY);
+      return localStorage.getItem(LOCAL_STORAGE_ADMIN_SESSION_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
 
-      if (storedPhotos) {
-        setPhotos(JSON.parse(storedPhotos));
-      } else {
-        setPhotos(INITIAL_PHOTOS);
-        localStorage.setItem(LOCAL_STORAGE_PHOTOS_KEY, JSON.stringify(INITIAL_PHOTOS));
-      }
-
-      if (storedVideos) {
-        setVideos(JSON.parse(storedVideos));
-      } else {
-        setVideos(INITIAL_VIDEOS);
-        localStorage.setItem(LOCAL_STORAGE_VIDEOS_KEY, JSON.stringify(INITIAL_VIDEOS));
-      }
-
-      if (storedProfile) {
-        setProfile(JSON.parse(storedProfile));
-      } else {
-        setProfile(INITIAL_PROFILE);
-        localStorage.setItem(LOCAL_STORAGE_PROFILE_KEY, JSON.stringify(INITIAL_PROFILE));
+  // Synchronously initialize state from localStorage or default samples to prevent any blank initial render
+  const [photos, setPhotos] = useState<PhotoItem[]>(() => {
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_PHOTOS_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) {
-      console.warn('Error accessing local storage:', e);
-      setPhotos(INITIAL_PHOTOS);
-      setVideos(INITIAL_VIDEOS);
-      setProfile(INITIAL_PROFILE);
+      console.warn('Photos read error:', e);
     }
-  }, []);
+    return INITIAL_PHOTOS;
+  });
 
-  // Save to local storage
+  const [videos, setVideos] = useState<VideoItem[]>(() => {
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_VIDEOS_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn('Videos read error:', e);
+    }
+    return INITIAL_VIDEOS;
+  });
+
+  const [profile, setProfile] = useState<ProfileData>(() => {
+    try {
+      const stored = localStorage.getItem(LOCAL_STORAGE_PROFILE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && parsed.name) return parsed;
+      }
+    } catch (e) {
+      console.warn('Profile read error:', e);
+    }
+    return INITIAL_PROFILE;
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'synced' | 'local' | 'syncing'>('local');
+
+  // Local storage persistence helpers
   const persistPhotosLocal = (data: PhotoItem[]) => {
     setPhotos(data);
     try {
@@ -110,55 +116,58 @@ export function useArchiveStore() {
   useEffect(() => {
     testConnection();
 
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      if (user) {
-        const isUserAdmin =
-          user.email === ADMIN_EMAIL ||
-          localStorage.getItem(LOCAL_STORAGE_ADMIN_SESSION_KEY) === 'true';
-        setIsAdmin(isUserAdmin);
-      } else {
-        const localSession = localStorage.getItem(LOCAL_STORAGE_ADMIN_SESSION_KEY) === 'true';
-        setIsAdmin(localSession);
+    if (auth) {
+      try {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+          setCurrentUser(user);
+          if (user) {
+            const isUserAdmin =
+              user.email === ADMIN_EMAIL ||
+              localStorage.getItem(LOCAL_STORAGE_ADMIN_SESSION_KEY) === 'true';
+            setIsAdmin(isUserAdmin);
+          } else {
+            const localSession = localStorage.getItem(LOCAL_STORAGE_ADMIN_SESSION_KEY) === 'true';
+            setIsAdmin(localSession);
+          }
+        });
+        return () => unsubscribeAuth();
+      } catch (authError) {
+        console.warn('Auth state subscription notice:', authError);
       }
-    });
-
-    return () => unsubscribeAuth();
+    }
   }, []);
 
-  // Initial Firestore & Local sync
+  // Background Firestore sync
   useEffect(() => {
-    loadLocalData();
-
     let isMounted = true;
 
     async function syncFirestoreData() {
+      if (!db) return;
       try {
         setSyncStatus('syncing');
 
-        // Fetch Photos from Firestore
+        // Fetch Photos
         const photoCol = collection(db, 'photos');
         const photoSnap = await getDocs(photoCol);
 
         if (isMounted && !photoSnap.empty) {
           const remotePhotos: PhotoItem[] = [];
-          photoSnap.forEach((doc) => {
-            remotePhotos.push({ ...(doc.data() as PhotoItem), id: doc.id });
+          photoSnap.forEach((docSnap) => {
+            remotePhotos.push({ ...(docSnap.data() as PhotoItem), id: docSnap.id });
           });
-          // Merge with initial samples if fewer than 2
           if (remotePhotos.length > 0) {
             persistPhotosLocal(remotePhotos);
           }
         }
 
-        // Fetch Videos from Firestore
+        // Fetch Videos
         const videoCol = collection(db, 'videos');
         const videoSnap = await getDocs(videoCol);
 
         if (isMounted && !videoSnap.empty) {
           const remoteVideos: VideoItem[] = [];
-          videoSnap.forEach((doc) => {
-            remoteVideos.push({ ...(doc.data() as VideoItem), id: doc.id });
+          videoSnap.forEach((docSnap) => {
+            remoteVideos.push({ ...(docSnap.data() as VideoItem), id: docSnap.id });
           });
           if (remoteVideos.length > 0) {
             persistVideosLocal(remoteVideos);
@@ -175,13 +184,11 @@ export function useArchiveStore() {
 
         if (isMounted) {
           setSyncStatus('synced');
-          setLoading(false);
         }
       } catch (err) {
-        console.info('Using high-performance local persistent archive cache:', err);
+        console.info('Using high-performance persistent local archive:', err);
         if (isMounted) {
           setSyncStatus('local');
-          setLoading(false);
         }
       }
     }
@@ -191,27 +198,27 @@ export function useArchiveStore() {
     return () => {
       isMounted = false;
     };
-  }, [loadLocalData]);
+  }, []);
 
   // Auth Actions
   const loginWithGoogle = async () => {
+    if (!auth) {
+      throw new Error('Firebase Auth가 초기화되지 않았습니다. 비밀번호(0192)로 로그인해 주세요.');
+    }
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       setCurrentUser(user);
-      const adminMatch = user.email === ADMIN_EMAIL || user.email?.includes('kkh040403');
-      setIsAdmin(true); // Grant admin rights on login in portfolio manager
+      setIsAdmin(true);
       localStorage.setItem(LOCAL_STORAGE_ADMIN_SESSION_KEY, 'true');
       return { success: true, user };
     } catch (error: any) {
-      console.warn('Google sign-in popup error, enabling local admin session:', error);
-      // Fallback: If popup was blocked by browser or domain restrictions, prompt passcode
+      console.warn('Google sign-in notice:', error);
       throw error;
     }
   };
 
   const loginWithPasscode = (code: string) => {
-    // Allows convenient verification without popup blockers (password: 0192)
     if (code.trim() === '0192' || code.trim() === 'archive2026' || code.trim() === 'admin' || code.trim() === '040403') {
       setIsAdmin(true);
       localStorage.setItem(LOCAL_STORAGE_ADMIN_SESSION_KEY, 'true');
@@ -221,10 +228,12 @@ export function useArchiveStore() {
   };
 
   const logout = async () => {
-    try {
-      await fbSignOut(auth);
-    } catch (e) {
-      console.warn(e);
+    if (auth) {
+      try {
+        await fbSignOut(auth);
+      } catch (e) {
+        console.warn(e);
+      }
     }
     setCurrentUser(null);
     setIsAdmin(false);
@@ -237,21 +246,21 @@ export function useArchiveStore() {
     const newPhoto: PhotoItem = {
       ...newPhotoData,
       id,
-      isSample: false, // User uploaded work
+      isSample: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: currentUser?.uid || 'admin',
     };
 
-    // Update local immediately for instant UI responsiveness
     const updated = [newPhoto, ...photos];
     persistPhotosLocal(updated);
 
-    // Persist to Cloud Firestore if available
-    try {
-      await setDoc(doc(db, 'photos', id), newPhoto);
-    } catch (err) {
-      handleFirestoreError(err, OperationType.CREATE, `photos/${id}`);
+    if (db) {
+      try {
+        await setDoc(doc(db, 'photos', id), newPhoto);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.CREATE, `photos/${id}`);
+      }
     }
 
     return newPhoto;
@@ -265,11 +274,13 @@ export function useArchiveStore() {
     );
     persistPhotosLocal(updated);
 
-    try {
-      const docRef = doc(db, 'photos', id);
-      await updateDoc(docRef, { ...updates, updatedAt: new Date().toISOString() });
-    } catch (err) {
-      handleFirestoreError(err, OperationType.UPDATE, `photos/${id}`);
+    if (db) {
+      try {
+        const docRef = doc(db, 'photos', id);
+        await updateDoc(docRef, { ...updates, updatedAt: new Date().toISOString() });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.UPDATE, `photos/${id}`);
+      }
     }
   };
 
@@ -277,10 +288,12 @@ export function useArchiveStore() {
     const updated = photos.filter((item) => item.id !== id);
     persistPhotosLocal(updated);
 
-    try {
-      await deleteDoc(doc(db, 'photos', id));
-    } catch (err) {
-      handleFirestoreError(err, OperationType.DELETE, `photos/${id}`);
+    if (db) {
+      try {
+        await deleteDoc(doc(db, 'photos', id));
+      } catch (err) {
+        handleFirestoreError(err, OperationType.DELETE, `photos/${id}`);
+      }
     }
   };
 
@@ -290,7 +303,7 @@ export function useArchiveStore() {
     const newVideo: VideoItem = {
       ...newVideoData,
       id,
-      isSample: false, // User uploaded work
+      isSample: false,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: currentUser?.uid || 'admin',
@@ -299,10 +312,12 @@ export function useArchiveStore() {
     const updated = [newVideo, ...videos];
     persistVideosLocal(updated);
 
-    try {
-      await setDoc(doc(db, 'videos', id), newVideo);
-    } catch (err) {
-      handleFirestoreError(err, OperationType.CREATE, `videos/${id}`);
+    if (db) {
+      try {
+        await setDoc(doc(db, 'videos', id), newVideo);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.CREATE, `videos/${id}`);
+      }
     }
 
     return newVideo;
@@ -316,11 +331,13 @@ export function useArchiveStore() {
     );
     persistVideosLocal(updated);
 
-    try {
-      const docRef = doc(db, 'videos', id);
-      await updateDoc(docRef, { ...updates, updatedAt: new Date().toISOString() });
-    } catch (err) {
-      handleFirestoreError(err, OperationType.UPDATE, `videos/${id}`);
+    if (db) {
+      try {
+        const docRef = doc(db, 'videos', id);
+        await updateDoc(docRef, { ...updates, updatedAt: new Date().toISOString() });
+      } catch (err) {
+        handleFirestoreError(err, OperationType.UPDATE, `videos/${id}`);
+      }
     }
   };
 
@@ -328,10 +345,12 @@ export function useArchiveStore() {
     const updated = videos.filter((item) => item.id !== id);
     persistVideosLocal(updated);
 
-    try {
-      await deleteDoc(doc(db, 'videos', id));
-    } catch (err) {
-      handleFirestoreError(err, OperationType.DELETE, `videos/${id}`);
+    if (db) {
+      try {
+        await deleteDoc(doc(db, 'videos', id));
+      } catch (err) {
+        handleFirestoreError(err, OperationType.DELETE, `videos/${id}`);
+      }
     }
   };
 
@@ -340,10 +359,12 @@ export function useArchiveStore() {
     const updated = { ...newProfile, updatedAt: new Date().toISOString() };
     persistProfileLocal(updated);
 
-    try {
-      await setDoc(doc(db, 'settings', 'profile'), updated);
-    } catch (err) {
-      handleFirestoreError(err, OperationType.WRITE, 'settings/profile');
+    if (db) {
+      try {
+        await setDoc(doc(db, 'settings', 'profile'), updated);
+      } catch (err) {
+        handleFirestoreError(err, OperationType.WRITE, 'settings/profile');
+      }
     }
   };
 
