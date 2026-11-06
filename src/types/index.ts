@@ -60,3 +60,4 @@ export interface ProfileData {
 }
 
 export type PageTab = 'HOME' | 'PHOTO' | 'VIDEO' | 'ABOUT' | 'ADMIN';
+export type Language = 'ko' | 'en';

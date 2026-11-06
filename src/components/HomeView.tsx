@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { PhotoItem, VideoItem, PageTab } from '../types';
+import { useLanguage } from '../lib/i18n';
 import { ArrowRight, Play, Eye, Volume2, VolumeX, Sparkles } from 'lucide-react';
 
 interface HomeViewProps {
@@ -18,6 +20,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onSelectVideo,
 }) => {
   const [videoMuted, setVideoMuted] = useState(true);
+  const { t } = useLanguage();
 
   // Pick primary featured video or photo
   const featuredVideo = videos.find((v) => v.isFeatured) || videos[0];
@@ -37,14 +40,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="lg:col-span-8">
               <div className="flex items-center gap-3 text-xs font-mono-archive tracking-[0.25em] text-[#888888]">
                 <span className="inline-block h-2 w-2 rounded-full bg-white animate-pulse" />
-                <span>STUDENT ARCHIVE • VISUAL ARTS &amp; MEDIA [2026]</span>
+                <span>{t.home.tag}</span>
               </div>
-              <h1 className="mt-4 text-4xl font-extrabold tracking-[-0.03em] sm:text-6xl lg:text-7xl">
-                Portfolio
+              <h1 className="mt-4 text-4xl font-extrabold font-display tracking-tight sm:text-6xl lg:text-7xl">
+                {t.home.portfolioTitle}
               </h1>
               <p className="mt-6 max-w-2xl text-sm leading-relaxed text-[#a1a1aa] sm:text-base">
-                시각 영상과 사진 예술을 전공하며 탐구한 학업 프로젝트와 개인 창작물의 기록입니다.
-                빛과 그림자의 명암 대비, 공간과 인물의 서사, 절제된 프레임 구도를 통해 나만의 고유한 시각 언어를 구축해 나가는 학생 포트폴리오 아카이브입니다.
+                {t.home.heroDesc}
               </p>
             </div>
 
@@ -53,7 +55,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 onClick={() => onSelectTab('PHOTO')}
                 className="group flex items-center justify-center gap-3 border border-[#333333] bg-[#181818] px-6 py-4 text-xs font-mono-archive tracking-widest text-white transition-all hover:border-white hover:bg-white hover:text-black"
               >
-                <span>EXPLORE PHOTO</span>
+                <span>{t.home.explorePhoto}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </button>
               <button
@@ -61,7 +63,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className="group flex items-center justify-center gap-3 border border-[#222222] bg-transparent px-6 py-4 text-xs font-mono-archive tracking-widest text-[#aaaaaa] transition-all hover:border-[#666666] hover:text-white"
               >
                 <Play className="h-3.5 w-3.5 fill-current" />
-                <span>WATCH CINEMA</span>
+                <span>{t.home.watchCinema}</span>
               </button>
             </div>
           </div>
@@ -143,25 +145,25 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Quick Technical Matrix Bar */}
           <div className="mt-8 grid grid-cols-2 gap-4 border border-[#1f1f1f] bg-[#141414] p-6 font-mono-archive text-xs text-[#888888] sm:grid-cols-4">
             <div>
-              <span className="text-[#555555] block text-[10px] uppercase">TOTAL ARCHIVE</span>
+              <span className="text-[#555555] block text-[10px] uppercase">{t.home.totalArchive}</span>
               <span className="mt-1 text-white font-semibold text-sm">
-                {(photos.length + videos.length).toString().padStart(2, '0')} WORKS
+                {(photos.length + videos.length).toString().padStart(2, '0')} {t.home.works}
               </span>
             </div>
             <div>
-              <span className="text-[#555555] block text-[10px] uppercase">STILL PHOTOGRAPHY</span>
+              <span className="text-[#555555] block text-[10px] uppercase">{t.home.stillPhotography}</span>
               <span className="mt-1 text-white font-semibold text-sm">
-                {photos.length.toString().padStart(2, '0')} FRAMES
+                {photos.length.toString().padStart(2, '0')} {t.home.frames}
               </span>
             </div>
             <div>
-              <span className="text-[#555555] block text-[10px] uppercase">CINEMATOGRAPHY</span>
+              <span className="text-[#555555] block text-[10px] uppercase">{t.home.cinematography}</span>
               <span className="mt-1 text-white font-semibold text-sm">
-                {videos.length.toString().padStart(2, '0')} FILMS
+                {videos.length.toString().padStart(2, '0')} {t.home.films}
               </span>
             </div>
             <div>
-              <span className="text-[#555555] block text-[10px] uppercase">MONOCHROME &amp; DUAL</span>
+              <span className="text-[#555555] block text-[10px] uppercase">{t.home.monochrome}</span>
               <span className="mt-1 text-white font-semibold text-sm">
                 4K UHD / RAW
               </span>
@@ -176,28 +178,48 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="flex items-end justify-between">
             <div>
               <div className="text-xs font-mono-archive tracking-widest text-[#777777]">
-                01 / STILL COLLECTION
+                {t.home.recentPhotosTitle}
               </div>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-white lg:text-3xl">
-                RECENT PHOTOGRAPHY
+              <h2 className="mt-2 text-2xl font-bold font-heading tracking-tight text-white lg:text-3xl">
+                {t.home.recentPhotosHeading}
               </h2>
             </div>
             <button
               onClick={() => onSelectTab('PHOTO')}
               className="hidden sm:flex items-center gap-2 text-xs font-mono-archive tracking-wider text-[#888888] hover:text-white transition-colors"
             >
-              <span>VIEW ALL PHOTOS ({photos.length})</span>
+              <span>{t.home.viewAllPhotos} ({photos.length})</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Photo Grid */}
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Photo Grid with Staggered Cascade */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+              },
+            }}
+            initial="hidden"
+            animate="visible"
+            className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          >
             {recentPhotos.map((photo) => (
-              <div
+              <motion.div
                 key={photo.id}
+                variants={{
+                  hidden: { opacity: 0, y: 16 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: 0.45, ease: [0.215, 0.61, 0.355, 1] },
+                  },
+                }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 onClick={() => onSelectPhoto(photo)}
-                className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-all hover:border-[#444444]"
+                className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-colors hover:border-[#444444]"
               >
                 <div className="aspect-[4/5] w-full overflow-hidden bg-[#181818]">
                   <img
@@ -223,9 +245,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     </span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <div className="mt-8 text-center sm:hidden">
             <button
@@ -245,27 +267,47 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="flex items-end justify-between">
             <div>
               <div className="text-xs font-mono-archive tracking-widest text-[#777777]">
-                02 / MOTION REEL
+                {t.home.recentVideosTitle}
               </div>
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-white lg:text-3xl">
-                CINEMATOGRAPHY WORKS
+              <h2 className="mt-2 text-2xl font-bold font-heading tracking-tight text-white lg:text-3xl">
+                {t.home.recentVideosHeading}
               </h2>
             </div>
             <button
               onClick={() => onSelectTab('VIDEO')}
               className="hidden sm:flex items-center gap-2 text-xs font-mono-archive tracking-wider text-[#888888] hover:text-white transition-colors"
             >
-              <span>VIEW ALL FILMS ({videos.length})</span>
+              <span>{t.home.viewAllVideos} ({videos.length})</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2">
+          <motion.div
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+              },
+            }}
+            initial="hidden"
+            animate="visible"
+            className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-2"
+          >
             {recentVideos.map((video) => (
-              <div
+              <motion.div
                 key={video.id}
+                variants={{
+                  hidden: { opacity: 0, y: 18 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { duration: 0.45, ease: [0.215, 0.61, 0.355, 1] },
+                  },
+                }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 onClick={() => onSelectVideo(video)}
-                className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-all hover:border-[#444444]"
+                className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-colors hover:border-[#444444]"
               >
                 <div className="relative aspect-video w-full overflow-hidden bg-black">
                   <img
@@ -309,9 +351,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     <span>{video.client || 'INDEPENDENT ARCHIVE'}</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>

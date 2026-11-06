@@ -203,7 +203,7 @@ export function useArchiveStore() {
   // Auth Actions
   const loginWithGoogle = async () => {
     if (!auth) {
-      throw new Error('Firebase Auth가 초기화되지 않았습니다. 비밀번호(0192)로 로그인해 주세요.');
+      throw new Error('인증 서비스 연결 중입니다. 비밀번호로 로그인해 주세요.');
     }
     try {
       const result = await signInWithPopup(auth, googleProvider);

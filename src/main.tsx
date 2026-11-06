@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
+import { LanguageProvider } from './lib/i18n';
 import './index.css';
 
 interface Props {
@@ -67,6 +68,8 @@ class ErrorBoundary extends Component<Props, State> {
 
 createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </ErrorBoundary>
 );

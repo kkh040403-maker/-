@@ -1,5 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
+import { motion } from 'motion/react';
 import { PhotoItem } from '../types';
+import { useLanguage } from '../lib/i18n';
 import { X, ChevronLeft, ChevronRight, Camera, Calendar, Tag, ExternalLink } from 'lucide-react';
 
 interface PhotoModalProps {
@@ -19,6 +21,7 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
   hasPrev = false,
   hasNext = false,
 }) => {
+  const { t } = useLanguage();
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -42,7 +45,13 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
   if (!photo) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#080808]/95 backdrop-blur-xl animate-fadeIn">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#080808]/95 backdrop-blur-xl"
+    >
       {/* Top Bar */}
       <div className="absolute top-0 left-0 right-0 z-20 flex h-16 items-center justify-between border-b border-[#222222] bg-[#0c0c0c]/80 px-6 backdrop-blur-md">
         <div className="flex items-center gap-3 font-mono-archive text-xs tracking-wider text-[#888888]">
@@ -51,11 +60,11 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
           <span>{photo.category}</span>
           {photo.isSample ? (
             <span className="rounded bg-[#222222] px-2 py-0.5 text-[10px] text-[#999999]">
-              SAMPLE
+              {t.modal.sampleTag}
             </span>
           ) : (
             <span className="rounded bg-[#1e293b] px-2 py-0.5 text-[10px] text-[#93c5fd]">
-              ORIGINAL ARCHIVE
+              {t.modal.archiveTag}
             </span>
           )}
         </div>
@@ -69,7 +78,7 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
             title="원본 이미지 열기"
           >
             <ExternalLink className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">VIEW RAW</span>
+            <span className="hidden sm:inline">{t.modal.viewRaw}</span>
           </a>
           <button
             onClick={onClose}
@@ -105,13 +114,23 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
       {/* Main Content Modal Body */}
       <div className="flex h-full w-full flex-col pt-16 lg:flex-row overflow-y-auto lg:overflow-hidden">
         {/* Left / Center Image Stage */}
-        <div className="relative flex flex-1 items-center justify-center p-4 lg:p-12 overflow-hidden">
-          <img
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          className="relative flex flex-1 items-center justify-center p-4 lg:p-12 overflow-hidden"
+        >
+          <motion.img
+            key={photo.id}
+            initial={{ opacity: 0.5 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
             src={photo.imageUrl}
             alt={photo.title}
             className="max-h-[82vh] max-w-full object-contain rounded-xs shadow-2xl transition-all select-none"
           />
-        </div>
+        </motion.div>
 
         {/* Right Info Drawer (Desktop) / Bottom Details (Mobile) */}
         <div className="w-full border-t border-[#222222] bg-[#111111] p-6 lg:w-96 lg:border-t-0 lg:border-l lg:p-8 flex flex-col justify-between shrink-0">
@@ -134,13 +153,13 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
             {/* Technical Metadata Matrix */}
             <div className="space-y-3 border-t border-[#222222] pt-5 font-mono-archive text-xs">
               <div className="text-[10px] uppercase tracking-widest text-[#666666]">
-                TECHNICAL SPECIFICATIONS
+                {t.modal.techSpecs}
               </div>
 
               <div className="flex items-center justify-between text-[#888888]">
                 <span className="flex items-center gap-2 text-[#666666]">
                   <Calendar className="h-3.5 w-3.5" />
-                  DATE
+                  {t.modal.date}
                 </span>
                 <span className="text-[#dddddd]">{photo.creationDate}</span>
               </div>
@@ -149,7 +168,7 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
                 <div className="flex items-center justify-between text-[#888888]">
                   <span className="flex items-center gap-2 text-[#666666]">
                     <Camera className="h-3.5 w-3.5" />
-                    CAMERA
+                    {t.modal.camera}
                   </span>
                   <span className="text-[#dddddd]">{photo.camera}</span>
                 </div>
@@ -159,24 +178,24 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
                 <div className="flex items-center justify-between text-[#888888]">
                   <span className="flex items-center gap-2 text-[#666666]">
                     <Tag className="h-3.5 w-3.5" />
-                    LENS
+                    {t.modal.lens}
                   </span>
                   <span className="text-[#dddddd]">{photo.lens}</span>
                 </div>
               )}
 
               <div className="flex items-center justify-between text-[#888888]">
-                <span className="text-[#666666]">IDENTIFIER</span>
+                <span className="text-[#666666]">{t.modal.identifier}</span>
                 <span className="text-[#dddddd]">{photo.id}</span>
               </div>
             </div>
           </div>
 
           <div className="mt-8 border-t border-[#222222] pt-4 text-center lg:text-left text-[11px] font-mono-archive text-[#555555]">
-            USE [←] [→] KEYS TO BROWSE • [ESC] TO CLOSE
+            {t.modal.keyboardGuide}
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

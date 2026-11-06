@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import { motion } from 'motion/react';
 import { PhotoItem } from '../types';
+import { useLanguage } from '../lib/i18n';
 import { Filter, Eye, Camera, Plus, Sparkles } from 'lucide-react';
 
 interface PhotoViewProps {
@@ -16,6 +18,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
   isAdmin = false,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const { t } = useLanguage();
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -39,15 +42,15 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
         <div className="flex flex-col justify-between gap-6 border-b border-[#222222] pb-8 md:flex-row md:items-end">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono-archive tracking-[0.25em] text-[#777777]">
-              <span>CATALOG // PHOTO</span>
+              <span>{t.photoView.tag}</span>
               <span>•</span>
               <span>{photos.length} ARCHIVED FRAMES</span>
             </div>
-            <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-5xl">
-              STILL PHOTOGRAPHY
+            <h1 className="mt-3 text-3xl font-extrabold font-heading tracking-tight sm:text-5xl">
+              {t.photoView.heading}
             </h1>
             <p className="mt-3 max-w-xl text-xs text-[#888888] sm:text-sm">
-              브루탈리즘 건축, 미니멀한 명암 대비, 도시의 침묵과 조각 같은 인물의 실루엣을 기록한 사진 작업물 아카이브입니다.
+              {t.photoView.subheading}
             </p>
           </div>
 
@@ -57,7 +60,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
               className="inline-flex items-center gap-2 border border-white bg-white px-5 py-3 text-xs font-mono-archive font-semibold tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
             >
               <Plus className="h-4 w-4" />
-              <span>사진 작품 업로드</span>
+              <span>{t.photoView.uploadBtn}</span>
             </button>
           )}
         </div>
@@ -93,14 +96,40 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
           })}
         </div>
 
-        {/* Photos Grid */}
+        {/* Photos Grid with Staggered Cascade Motion */}
         {filteredPhotos.length > 0 ? (
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div
+            key={selectedCategory}
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.05,
+                },
+              },
+            }}
+            className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {filteredPhotos.map((photo) => (
-              <div
+              <motion.div
                 key={photo.id}
+                variants={{
+                  hidden: { opacity: 0, y: 18 },
+                  show: {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: 0.45,
+                      ease: [0.16, 1, 0.3, 1],
+                    },
+                  },
+                }}
+                whileHover={{ y: -5, transition: { duration: 0.25, ease: 'easeOut' } }}
                 onClick={() => onSelectPhoto(photo)}
-                className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-all duration-300 hover:border-[#444444]"
+                className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-colors duration-300 hover:border-[#4f4f4f]"
               >
                 {/* Photo Image Aspect */}
                 <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#181818]">
@@ -108,7 +137,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
                     src={photo.thumbnailUrl || photo.imageUrl}
                     alt={photo.title}
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                   {/* Subtle hover gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#101010]/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -154,9 +183,9 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
                     </span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         ) : (
           /* Empty State */
           <div className="mt-20 flex flex-col items-center justify-center rounded-xs border border-dashed border-[#222222] py-24 text-center">

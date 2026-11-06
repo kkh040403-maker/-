@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import { motion } from 'motion/react';
 import { VideoItem } from '../types';
+import { useLanguage } from '../lib/i18n';
 import { Filter, Play, Film, Plus } from 'lucide-react';
 
 interface VideoViewProps {
@@ -16,6 +18,7 @@ export const VideoView: React.FC<VideoViewProps> = ({
   isAdmin = false,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const { t } = useLanguage();
 
   // Extract unique video categories
   const categories = useMemo(() => {
@@ -38,15 +41,15 @@ export const VideoView: React.FC<VideoViewProps> = ({
         <div className="flex flex-col justify-between gap-6 border-b border-[#222222] pb-8 md:flex-row md:items-end">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono-archive tracking-[0.25em] text-[#777777]">
-              <span>CATALOG // VIDEO</span>
+              <span>{t.videoView.tag}</span>
               <span>•</span>
               <span>{videos.length} ARCHIVED REELS</span>
             </div>
-            <h1 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-5xl">
-              CINEMATOGRAPHY
+            <h1 className="mt-3 text-3xl font-extrabold font-heading tracking-tight sm:text-5xl">
+              {t.videoView.heading}
             </h1>
             <p className="mt-3 max-w-xl text-xs text-[#888888] sm:text-sm">
-              상업 필름, 시네마틱 뮤직비디오, 실험적 모션 그래픽스 및 단편 영상을 엄선하여 수록한 영상 아카이브입니다.
+              {t.videoView.subheading}
             </p>
           </div>
 
@@ -56,7 +59,7 @@ export const VideoView: React.FC<VideoViewProps> = ({
               className="inline-flex items-center gap-2 border border-white bg-white px-5 py-3 text-xs font-mono-archive font-semibold tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
             >
               <Plus className="h-4 w-4" />
-              <span>영상 작품 업로드</span>
+              <span>{t.videoView.uploadBtn}</span>
             </button>
           )}
         </div>
@@ -92,14 +95,40 @@ export const VideoView: React.FC<VideoViewProps> = ({
           })}
         </div>
 
-        {/* Video Works Grid */}
+        {/* Video Works Grid with Staggered Cascade Motion */}
         {filteredVideos.length > 0 ? (
-          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2">
+          <motion.div
+            key={selectedCategory}
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.06,
+                },
+              },
+            }}
+            className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2"
+          >
             {filteredVideos.map((video) => (
-              <div
+              <motion.div
                 key={video.id}
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  show: {
+                    opacity: 1,
+                    y: 0,
+                    transition: {
+                      duration: 0.45,
+                      ease: [0.16, 1, 0.3, 1],
+                    },
+                  },
+                }}
+                whileHover={{ y: -5, transition: { duration: 0.25, ease: 'easeOut' } }}
                 onClick={() => onSelectVideo(video)}
-                className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-all duration-300 hover:border-[#444444]"
+                className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-colors duration-300 hover:border-[#4f4f4f]"
               >
                 {/* Video Thumbnail Stage */}
                 <div className="relative aspect-video w-full overflow-hidden bg-black">
@@ -107,7 +136,7 @@ export const VideoView: React.FC<VideoViewProps> = ({
                     src={video.thumbnailUrl}
                     alt={video.title}
                     loading="lazy"
-                    className="h-full w-full object-cover opacity-85 transition-all duration-700 group-hover:scale-105 group-hover:opacity-100"
+                    className="h-full w-full object-cover opacity-85 transition-all duration-700 ease-out group-hover:scale-105 group-hover:opacity-100"
                   />
 
                   {/* Play Button Icon */}
@@ -170,9 +199,9 @@ export const VideoView: React.FC<VideoViewProps> = ({
                     </span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         ) : (
           /* Empty State */
           <div className="mt-20 flex flex-col items-center justify-center rounded-xs border border-dashed border-[#222222] py-24 text-center">

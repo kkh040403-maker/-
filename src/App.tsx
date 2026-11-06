@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { PageTab, PhotoItem, VideoItem } from './types';
 import { useArchiveStore } from './lib/store';
 import { Header } from './components/Header';
@@ -92,86 +93,106 @@ export default function App() {
         onSelectTab={handleSelectTab}
         isAdmin={isAdmin}
         totalItems={totalWorks}
+        onLogout={logout}
       />
 
-      {/* Main View Router */}
-      <main className="flex-1">
-        {currentTab === 'HOME' && (
-          <HomeView
-            photos={photos}
-            videos={videos}
-            onSelectTab={handleSelectTab}
-            onSelectPhoto={(photo) => setSelectedPhoto(photo)}
-            onSelectVideo={(video) => setSelectedVideo(video)}
-          />
-        )}
+      {/* Main View Router with Smooth Cross-Fade */}
+      <main className="flex-1 overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentTab}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full h-full"
+          >
+            {currentTab === 'HOME' && (
+              <HomeView
+                photos={photos}
+                videos={videos}
+                onSelectTab={handleSelectTab}
+                onSelectPhoto={(photo) => setSelectedPhoto(photo)}
+                onSelectVideo={(video) => setSelectedVideo(video)}
+              />
+            )}
 
-        {currentTab === 'PHOTO' && (
-          <PhotoView
-            photos={photos}
-            onSelectPhoto={(photo) => setSelectedPhoto(photo)}
-            onGoToUpload={() => handleSelectTab('ADMIN')}
-            isAdmin={isAdmin}
-          />
-        )}
+            {currentTab === 'PHOTO' && (
+              <PhotoView
+                photos={photos}
+                onSelectPhoto={(photo) => setSelectedPhoto(photo)}
+                onGoToUpload={() => handleSelectTab('ADMIN')}
+                isAdmin={isAdmin}
+              />
+            )}
 
-        {currentTab === 'VIDEO' && (
-          <VideoView
-            videos={videos}
-            onSelectVideo={(video) => setSelectedVideo(video)}
-            onGoToUpload={() => handleSelectTab('ADMIN')}
-            isAdmin={isAdmin}
-          />
-        )}
+            {currentTab === 'VIDEO' && (
+              <VideoView
+                videos={videos}
+                onSelectVideo={(video) => setSelectedVideo(video)}
+                onGoToUpload={() => handleSelectTab('ADMIN')}
+                isAdmin={isAdmin}
+              />
+            )}
 
-        {currentTab === 'ABOUT' && (
-          <AboutView
-            profile={profile}
-            isAdmin={isAdmin}
-            onGoToEditProfile={() => handleSelectTab('ADMIN')}
-          />
-        )}
+            {currentTab === 'ABOUT' && (
+              <AboutView
+                profile={profile}
+                isAdmin={isAdmin}
+                onGoToEditProfile={() => handleSelectTab('ADMIN')}
+              />
+            )}
 
-        {currentTab === 'ADMIN' && (
-          <AdminView
-            isAdmin={isAdmin}
-            currentUserEmail={currentUser?.email}
-            photos={photos}
-            videos={videos}
-            profile={profile}
-            onLoginGoogle={loginWithGoogle}
-            onLoginPasscode={loginWithPasscode}
-            onLogout={logout}
-            onAddPhoto={addPhoto}
-            onUpdatePhoto={updatePhoto}
-            onDeletePhoto={deletePhoto}
-            onAddVideo={addVideo}
-            onUpdateVideo={updateVideo}
-            onDeleteVideo={deleteVideo}
-            onUpdateProfile={updateProfile}
-            onResetSamples={resetToSampleData}
-          />
-        )}
+            {currentTab === 'ADMIN' && (
+              <AdminView
+                isAdmin={isAdmin}
+                currentUserEmail={currentUser?.email}
+                photos={photos}
+                videos={videos}
+                profile={profile}
+                onLoginGoogle={loginWithGoogle}
+                onLoginPasscode={loginWithPasscode}
+                onLogout={logout}
+                onAddPhoto={addPhoto}
+                onUpdatePhoto={updatePhoto}
+                onDeletePhoto={deletePhoto}
+                onAddVideo={addVideo}
+                onUpdateVideo={updateVideo}
+                onDeleteVideo={deleteVideo}
+                onUpdateProfile={updateProfile}
+                onResetSamples={resetToSampleData}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
-      {/* Modals */}
-      <PhotoModal
-        photo={selectedPhoto}
-        onClose={() => setSelectedPhoto(null)}
-        onPrev={handlePrevPhoto}
-        onNext={handleNextPhoto}
-        hasPrev={hasPrevPhoto}
-        hasNext={hasNextPhoto}
-      />
+      {/* Modals with Smooth Cinematic Fade & Scale */}
+      <AnimatePresence>
+        {selectedPhoto && (
+          <PhotoModal
+            photo={selectedPhoto}
+            onClose={() => setSelectedPhoto(null)}
+            onPrev={handlePrevPhoto}
+            onNext={handleNextPhoto}
+            hasPrev={hasPrevPhoto}
+            hasNext={hasNextPhoto}
+          />
+        )}
+      </AnimatePresence>
 
-      <VideoModal
-        video={selectedVideo}
-        onClose={() => setSelectedVideo(null)}
-        onPrev={handlePrevVideo}
-        onNext={handleNextVideo}
-        hasPrev={hasPrevVideo}
-        hasNext={hasNextVideo}
-      />
+      <AnimatePresence>
+        {selectedVideo && (
+          <VideoModal
+            video={selectedVideo}
+            onClose={() => setSelectedVideo(null)}
+            onPrev={handlePrevVideo}
+            onNext={handleNextVideo}
+            hasPrev={hasPrevVideo}
+            hasNext={hasNextVideo}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
       <Footer onSelectTab={handleSelectTab} isAdmin={isAdmin} />

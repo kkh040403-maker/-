@@ -1,5 +1,7 @@
 import React, { useEffect, useCallback, useMemo } from 'react';
+import { motion } from 'motion/react';
 import { VideoItem } from '../types';
+import { useLanguage } from '../lib/i18n';
 import { X, ChevronLeft, ChevronRight, Play, Film, Calendar, Clapperboard, ExternalLink } from 'lucide-react';
 
 interface VideoModalProps {
@@ -19,6 +21,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   hasPrev = false,
   hasNext = false,
 }) => {
+  const { t } = useLanguage();
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -72,7 +75,13 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   if (!video) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#080808]/95 backdrop-blur-xl animate-fadeIn">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#080808]/95 backdrop-blur-xl"
+    >
       {/* Top Bar */}
       <div className="absolute top-0 left-0 right-0 z-20 flex h-16 items-center justify-between border-b border-[#222222] bg-[#0c0c0c]/80 px-6 backdrop-blur-md">
         <div className="flex items-center gap-3 font-mono-archive text-xs tracking-wider text-[#888888]">
@@ -86,11 +95,11 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           )}
           {video.isSample ? (
             <span className="rounded bg-[#222222] px-2 py-0.5 text-[10px] text-[#999999]">
-              SAMPLE
+              {t.modal.sampleTag}
             </span>
           ) : (
             <span className="rounded bg-[#1e293b] px-2 py-0.5 text-[10px] text-[#93c5fd]">
-              ORIGINAL ARCHIVE
+              {t.modal.archiveTag}
             </span>
           )}
         </div>
@@ -104,7 +113,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
             title="원본 영상 링크 열기"
           >
             <ExternalLink className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">SOURCE</span>
+            <span className="hidden sm:inline">{t.modal.source}</span>
           </a>
           <button
             onClick={onClose}
@@ -141,7 +150,14 @@ export const VideoModal: React.FC<VideoModalProps> = ({
       <div className="flex h-full w-full flex-col pt-16 lg:flex-row overflow-y-auto lg:overflow-hidden">
         {/* Left / Center Video Stage */}
         <div className="relative flex flex-1 items-center justify-center p-4 lg:p-12 overflow-hidden bg-[#070707]">
-          <div className="w-full max-w-5xl aspect-video rounded-xs overflow-hidden shadow-2xl bg-black border border-[#222222]">
+          <motion.div
+            key={video.id}
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full max-w-5xl aspect-video rounded-xs overflow-hidden shadow-2xl bg-black border border-[#222222]"
+          >
             {embedInfo.type === 'direct' ? (
               <video
                 key={video.id}
@@ -164,7 +180,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
                 allowFullScreen
               />
             )}
-          </div>
+          </motion.div>
         </div>
 
         {/* Right Info Drawer (Desktop) / Bottom Details (Mobile) */}
@@ -189,13 +205,13 @@ export const VideoModal: React.FC<VideoModalProps> = ({
             {/* Technical Metadata Matrix */}
             <div className="space-y-3 border-t border-[#222222] pt-5 font-mono-archive text-xs">
               <div className="text-[10px] uppercase tracking-widest text-[#666666]">
-                CINEMA SPECIFICATIONS
+                {t.modal.cinemaSpecs}
               </div>
 
               <div className="flex items-center justify-between text-[#888888]">
                 <span className="flex items-center gap-2 text-[#666666]">
                   <Calendar className="h-3.5 w-3.5" />
-                  DATE
+                  {t.modal.date}
                 </span>
                 <span className="text-[#dddddd]">{video.creationDate}</span>
               </div>
@@ -204,7 +220,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
                 <div className="flex items-center justify-between text-[#888888]">
                   <span className="flex items-center gap-2 text-[#666666]">
                     <Film className="h-3.5 w-3.5" />
-                    RUNNING TIME
+                    {t.modal.runningTime}
                   </span>
                   <span className="text-[#dddddd]">{video.duration}</span>
                 </div>
@@ -214,7 +230,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
                 <div className="flex items-center justify-between text-[#888888]">
                   <span className="flex items-center gap-2 text-[#666666]">
                     <Clapperboard className="h-3.5 w-3.5" />
-                    RESOLUTION
+                    {t.modal.resolution}
                   </span>
                   <span className="text-[#dddddd]">{video.resolution}</span>
                 </div>
@@ -222,23 +238,23 @@ export const VideoModal: React.FC<VideoModalProps> = ({
 
               {video.client && (
                 <div className="flex items-center justify-between text-[#888888]">
-                  <span className="text-[#666666]">CLIENT / COLLAB</span>
+                  <span className="text-[#666666]">{t.modal.client}</span>
                   <span className="text-[#dddddd]">{video.client}</span>
                 </div>
               )}
 
               <div className="flex items-center justify-between text-[#888888]">
-                <span className="text-[#666666]">STREAM TYPE</span>
+                <span className="text-[#666666]">{t.modal.streamType}</span>
                 <span className="text-[#dddddd] uppercase">{embedInfo.type}</span>
               </div>
             </div>
           </div>
 
           <div className="mt-8 border-t border-[#222222] pt-4 text-center lg:text-left text-[11px] font-mono-archive text-[#555555]">
-            USE [←] [→] KEYS TO BROWSE • [ESC] TO CLOSE
+            {t.modal.keyboardGuide}
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

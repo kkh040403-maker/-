@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PhotoItem, VideoItem, ProfileData } from '../types';
 import { uploadMediaFile } from '../lib/firebase';
+import { useLanguage } from '../lib/i18n';
 import {
   Lock,
   Unlock,
@@ -62,10 +63,10 @@ export const AdminView: React.FC<AdminViewProps> = ({
   onUpdateProfile,
   onResetSamples,
 }) => {
+  const { t } = useLanguage();
   // Login State
   const [passcode, setPasscode] = useState('');
   const [loginError, setLoginError] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
 
   // Active Admin Tab
   const [activeTab, setActiveTab] = useState<AdminTab>('UPLOAD_PHOTO');
@@ -137,21 +138,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
     setLoginError('');
     const success = onLoginPasscode(passcode);
     if (!success) {
-      setLoginError('비밀번호가 일치하지 않습니다. (관리자 비밀번호: 0192)');
-    }
-  };
-
-  // Handle Google Login
-  const handleGoogleLoginClick = async () => {
-    setLoginLoading(true);
-    setLoginError('');
-    try {
-      await onLoginGoogle();
-    } catch (err: any) {
-      console.warn('Google sign-in error:', err);
-      setLoginError('Google 로그인 팝업이 차단되었거나 실패했습니다. 관리자 비밀번호(0192)를 입력해 주세요.');
-    } finally {
-      setLoginLoading(false);
+      setLoginError('비밀번호가 일치하지 않습니다. 다시 확인해 주세요.');
     }
   };
 
@@ -381,17 +368,17 @@ export const AdminView: React.FC<AdminViewProps> = ({
           <div className="flex items-center justify-between border-b border-[#222222] pb-5">
             <div className="flex items-center gap-2 font-mono-archive text-xs tracking-widest text-[#777777]">
               <Lock className="h-4 w-4 text-[#aaaaaa]" />
-              <span>ADMINISTRATOR GATE</span>
+              <span>{t.admin.gateTitle}</span>
             </div>
             <span className="font-mono-archive text-[10px] text-[#555555]">SECURE</span>
           </div>
 
           <div className="mt-6">
             <h2 className="text-2xl font-bold tracking-tight text-white">
-              관리자 콘솔 로그인
+              {t.admin.consoleTitle}
             </h2>
             <p className="mt-2 text-xs leading-relaxed text-[#888888]">
-              아카이브 작품 등록, 수정, 삭제 및 프로필 관리는 인증된 관리자만 가능합니다.
+              {t.admin.consoleDesc}
             </p>
           </div>
 
@@ -402,67 +389,27 @@ export const AdminView: React.FC<AdminViewProps> = ({
             </div>
           )}
 
-          {/* Google Auth Button */}
-          <div className="mt-6">
-            <button
-              onClick={handleGoogleLoginClick}
-              disabled={loginLoading}
-              className="flex w-full items-center justify-center gap-3 border border-[#333333] bg-[#1a1a1a] py-3 text-xs font-mono-archive tracking-wider text-white transition-all hover:border-white hover:bg-[#252525] disabled:opacity-50"
-            >
-              <svg className="h-4 w-4" viewBox="0 0 24 24">
-                <path
-                  fill="#EA4335"
-                  d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"
-                />
-                <path
-                  fill="#4285F4"
-                  d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5.1 3.7-8.8z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15s.7 5.3 1.9 7.7l3.7-2.9z"
-                />
-                <path
-                  fill="#34A853"
-                  d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2-6.4-4.8L1.9 16.4C3.7 20.1 7.5 23 12 23z"
-                />
-              </svg>
-              <span>{loginLoading ? '로그인 중...' : 'Google 계정으로 로그인'}</span>
-            </button>
-          </div>
-
-          <div className="relative my-6 flex items-center justify-center">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#222222]" />
-            </div>
-            <span className="relative bg-[#141414] px-3 font-mono-archive text-[10px] tracking-widest text-[#555555]">
-              OR DIRECT PASSCODE
-            </span>
-          </div>
-
-          {/* Passcode fallback */}
-          <form onSubmit={handlePasscodeSubmit} className="space-y-4">
+          {/* Admin Passcode Form */}
+          <form onSubmit={handlePasscodeSubmit} className="mt-6 space-y-4">
             <div>
               <label className="block font-mono-archive text-[11px] text-[#777777] uppercase tracking-wider">
-                관리자 비밀번호
+                {t.admin.passcodeLabel}
               </label>
               <input
                 type="password"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                placeholder="0192"
-                className="mt-1.5 w-full rounded-xs border border-[#2a2a2a] bg-[#101010] px-3.5 py-2.5 font-mono-archive text-xs text-white placeholder-[#444444] focus:border-white focus:outline-none"
+                placeholder={t.admin.passcodePlaceholder}
+                autoFocus
+                className="mt-1.5 w-full rounded-xs border border-[#2a2a2a] bg-[#101010] px-3.5 py-2.5 font-mono-archive text-xs text-white placeholder-[#555555] focus:border-white focus:outline-none"
               />
-              <span className="mt-1 block text-[10px] font-mono-archive text-[#555555]">
-                관리자 비밀번호: <strong className="text-[#cccccc]">0192</strong>
-              </span>
             </div>
 
             <button
               type="submit"
               className="w-full border border-white bg-white py-2.5 font-mono-archive text-xs font-semibold tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
             >
-              접속하기
+              {t.admin.loginBtn}
             </button>
           </form>
         </div>
@@ -480,7 +427,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             <div className="flex items-center gap-2.5">
               <span className="h-2 w-2 rounded-full bg-emerald-400" />
               <span className="font-mono-archive text-xs tracking-widest text-[#aaaaaa]">
-                ADMINISTRATOR WORKSPACE
+                {t.admin.workspaceTitle}
               </span>
               <span className="text-[#444444]">|</span>
               <span className="font-mono-archive text-xs text-[#666666]">
@@ -488,17 +435,18 @@ export const AdminView: React.FC<AdminViewProps> = ({
               </span>
             </div>
             <h1 className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              아카이브 미디어 및 콘텐츠 관리
+              {t.admin.workspaceTitle}
             </h1>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={onLogout}
-              className="flex items-center gap-2 rounded-xs border border-[#333333] bg-[#161616] px-4 py-2 text-xs font-mono-archive text-[#cccccc] hover:border-[#666666] hover:text-white transition-colors"
+              className="flex items-center gap-2 rounded-xs border border-red-900/40 bg-red-950/20 px-4 py-2 text-xs font-mono-archive text-red-300 hover:bg-red-900/40 hover:text-white transition-colors"
+              title="관리자 세션 종료 및 로그아웃"
             >
               <LogOut className="h-3.5 w-3.5" />
-              <span>로그아웃</span>
+              <span>{t.admin.logoutBtn}</span>
             </button>
           </div>
         </div>
@@ -530,7 +478,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             }`}
           >
             <Image className="h-3.5 w-3.5" />
-            <span>사진 작품 업로드</span>
+            <span>{t.admin.tabUploadPhoto}</span>
           </button>
 
           <button
@@ -542,7 +490,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             }`}
           >
             <Video className="h-3.5 w-3.5" />
-            <span>영상 작품 업로드</span>
+            <span>{t.admin.tabUploadVideo}</span>
           </button>
 
           <button
@@ -554,7 +502,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             }`}
           >
             <Edit2 className="h-3.5 w-3.5" />
-            <span>작품 목록 및 수정 ({photos.length + videos.length})</span>
+            <span>{t.admin.tabManage} ({photos.length + videos.length})</span>
           </button>
 
           <button
@@ -566,7 +514,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             }`}
           >
             <FileText className="h-3.5 w-3.5" />
-            <span>소개글 (ABOUT) 수정</span>
+            <span>{t.admin.tabAbout}</span>
           </button>
 
           <button
@@ -578,7 +526,7 @@ export const AdminView: React.FC<AdminViewProps> = ({
             }`}
           >
             <Download className="h-3.5 w-3.5" />
-            <span>데이터 백업 &amp; 복원</span>
+            <span>{t.admin.tabBackup}</span>
           </button>
         </div>
 

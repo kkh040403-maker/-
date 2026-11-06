@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PageTab } from '../types';
+import { useLanguage } from '../lib/i18n';
 import { ArrowUp } from 'lucide-react';
 
 interface FooterProps {
@@ -9,6 +10,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
   const [timeStr, setTimeStr] = useState('');
+  const { t } = useLanguage();
 
   useEffect(() => {
     const updateTime = () => {
@@ -42,8 +44,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
               PORTFOLIO
             </h3>
             <p className="mt-4 max-w-md text-xs leading-relaxed text-[#888888]">
-              A personal digital archive showcasing student works in still photography, cinematography, and creative visual media.
-              Recording creative exploration, coursework projects, and independent film direction.
+              {t.footer.archiveDesc}
             </p>
             <div className="mt-6 flex items-center gap-4 text-xs font-mono-archive text-[#666666]">
               <span>SEOUL 37°33&apos;N 126°58&apos;E</span>
@@ -63,7 +64,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
                   onClick={() => onSelectTab('HOME')}
                   className="hover:text-white transition-colors"
                 >
-                  01 / HOME
+                  01 / {t.nav.home}
                 </button>
               </li>
               <li>
@@ -71,7 +72,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
                   onClick={() => onSelectTab('PHOTO')}
                   className="hover:text-white transition-colors"
                 >
-                  02 / PHOTO ARCHIVE
+                  02 / {t.nav.photo}
                 </button>
               </li>
               <li>
@@ -79,7 +80,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
                   onClick={() => onSelectTab('VIDEO')}
                   className="hover:text-white transition-colors"
                 >
-                  03 / CINEMATOGRAPHY
+                  03 / {t.nav.video}
                 </button>
               </li>
               <li>
@@ -87,7 +88,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
                   onClick={() => onSelectTab('ABOUT')}
                   className="hover:text-white transition-colors"
                 >
-                  04 / ABOUT &amp; CONTACT
+                  04 / {t.nav.about}
                 </button>
               </li>
             </ul>
