@@ -105,7 +105,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
                   onClick={() => onSelectTab('ADMIN')}
                   className="hover:text-white transition-colors flex items-center gap-1.5"
                 >
-                  <span>{isAdmin ? 'ADMIN CONSOLE (ACTIVE)' : 'ADMIN ACCESS'}</span>
+                  <span>{isAdmin ? t.nav.adminActive : t.nav.adminAccess}</span>
                 </button>
               </li>
               <li className="text-[#555555]">
@@ -120,7 +120,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
                   className="mt-2 flex items-center gap-1.5 text-xs text-[#999999] hover:text-white transition-colors"
                 >
                   <ArrowUp className="h-3.5 w-3.5" />
-                  <span>BACK TO TOP</span>
+                  <span>{t.nav.home === '홈' ? '맨 위로 이동' : 'BACK TO TOP'}</span>
                 </button>
               </li>
             </ul>

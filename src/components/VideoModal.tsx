@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { VideoItem } from '../types';
-import { useLanguage } from '../lib/i18n';
+import { useLanguage, getCategoryLabel } from '../lib/i18n';
 import { X, ChevronLeft, ChevronRight, Play, Film, Calendar, Clapperboard, ExternalLink } from 'lucide-react';
 
 interface VideoModalProps {
@@ -21,7 +21,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
   hasPrev = false,
   hasNext = false,
 }) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -87,7 +87,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         <div className="flex items-center gap-3 font-mono-archive text-xs tracking-wider text-[#888888]">
           <span className="text-white font-semibold">{video.archiveCode || 'VIDEO'}</span>
           <span>/</span>
-          <span>{video.category}</span>
+          <span>{getCategoryLabel(video.category, language)}</span>
           {video.resolution && (
             <span className="rounded border border-[#333333] px-1.5 py-0.5 text-[10px] text-[#cccccc]">
               {video.resolution}
@@ -188,7 +188,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 text-[11px] font-mono-archive tracking-widest text-[#777777] uppercase">
-                <span>{video.category}</span>
+                <span>{getCategoryLabel(video.category, language)}</span>
                 {video.duration && <span>• {video.duration}</span>}
               </div>
               <h2 className="mt-1 text-xl font-bold tracking-tight text-white lg:text-2xl">

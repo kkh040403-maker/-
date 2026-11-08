@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { PhotoItem } from '../types';
-import { useLanguage } from '../lib/i18n';
+import { useLanguage, getCategoryLabel } from '../lib/i18n';
 import { X, ChevronLeft, ChevronRight, Camera, Calendar, Tag, ExternalLink } from 'lucide-react';
 
 interface PhotoModalProps {
@@ -21,7 +21,7 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
   hasPrev = false,
   hasNext = false,
 }) => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -57,7 +57,7 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
         <div className="flex items-center gap-3 font-mono-archive text-xs tracking-wider text-[#888888]">
           <span className="text-white font-semibold">{photo.archiveCode || 'PHOTO'}</span>
           <span>/</span>
-          <span>{photo.category}</span>
+          <span>{getCategoryLabel(photo.category, language)}</span>
           {photo.isSample ? (
             <span className="rounded bg-[#222222] px-2 py-0.5 text-[10px] text-[#999999]">
               {t.modal.sampleTag}
@@ -137,7 +137,7 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
           <div className="space-y-6">
             <div>
               <div className="text-[11px] font-mono-archive tracking-widest text-[#777777] uppercase">
-                {photo.category}
+                {getCategoryLabel(photo.category, language)}
               </div>
               <h2 className="mt-1 text-xl font-bold tracking-tight text-white lg:text-2xl">
                 {photo.title}

@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { PhotoItem } from '../types';
-import { useLanguage } from '../lib/i18n';
-import { Filter, Eye, Camera, Plus, Sparkles } from 'lucide-react';
+import { useLanguage, getCategoryLabel } from '../lib/i18n';
+import { Filter, Eye, Camera, Plus } from 'lucide-react';
 
 interface PhotoViewProps {
   photos: PhotoItem[];
@@ -18,7 +18,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
   isAdmin = false,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -44,7 +44,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
             <div className="flex items-center gap-2 text-xs font-mono-archive tracking-[0.25em] text-[#777777]">
               <span>{t.photoView.tag}</span>
               <span>•</span>
-              <span>{photos.length} ARCHIVED FRAMES</span>
+              <span>{photos.length} {t.photoView.archivedFramesSuffix}</span>
             </div>
             <h1 className="mt-3 text-3xl font-extrabold font-heading tracking-tight sm:text-5xl">
               {t.photoView.heading}
@@ -69,7 +69,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
         <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-[#1c1c1c] pb-6">
           <div className="mr-3 flex items-center gap-1.5 text-xs font-mono-archive text-[#555555]">
             <Filter className="h-3.5 w-3.5" />
-            <span>FILTER:</span>
+            <span>{t.photoView.filterLabel}:</span>
           </div>
           {categories.map((cat) => {
             const isSelected = selectedCategory === cat;
@@ -77,6 +77,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
               cat === 'ALL'
                 ? photos.length
                 : photos.filter((p) => p.category.toLowerCase() === cat.toLowerCase()).length;
+            const localizedLabel = getCategoryLabel(cat, language);
             return (
               <button
                 key={cat}
@@ -87,7 +88,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
                     : 'bg-[#181818] text-[#888888] hover:bg-[#222222] hover:text-[#cccccc]'
                 }`}
               >
-                <span>{cat}</span>
+                <span>{localizedLabel}</span>
                 <span className={`ml-1.5 text-[10px] ${isSelected ? 'text-[#555555]' : 'text-[#555555]'}`}>
                   ({count})
                 </span>
@@ -146,11 +147,11 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
                   <div className="absolute top-3 right-3 flex items-center gap-1.5">
                     {photo.isSample ? (
                       <span className="rounded bg-black/60 px-2 py-0.5 font-mono-archive text-[10px] text-[#888888] backdrop-blur-sm">
-                        SAMPLE
+                        {t.photoView.sampleBadge}
                       </span>
                     ) : (
                       <span className="rounded border border-[#3b82f6]/40 bg-[#1e293b]/80 px-2 py-0.5 font-mono-archive text-[10px] text-[#93c5fd] backdrop-blur-sm">
-                        ORIGINAL
+                        {t.photoView.originalBadge}
                       </span>
                     )}
                   </div>
@@ -161,7 +162,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
                   <div className="flex items-center justify-between text-[11px] font-mono-archive text-[#666666]">
                     <span>{photo.archiveCode || 'ARCH-P'}</span>
                     <span className="rounded bg-[#1c1c1c] px-2 py-0.5 text-[#999999]">
-                      {photo.category}
+                      {getCategoryLabel(photo.category, language)}
                     </span>
                   </div>
 
@@ -179,7 +180,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
                     <span>{photo.creationDate}</span>
                     <span className="flex items-center gap-1 text-[#aaaaaa] opacity-80 group-hover:opacity-100">
                       <Eye className="h-3 w-3" />
-                      <span>DETAIL</span>
+                      <span>{t.photoView.detail}</span>
                     </span>
                   </div>
                 </div>
@@ -190,23 +191,23 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
           /* Empty State */
           <div className="mt-20 flex flex-col items-center justify-center rounded-xs border border-dashed border-[#222222] py-24 text-center">
             <Camera className="h-10 w-10 text-[#444444]" />
-            <h3 className="mt-4 text-base font-semibold text-white">등록된 사진 작품이 없습니다</h3>
+            <h3 className="mt-4 text-base font-semibold text-white">{t.photoView.emptyHeading}</h3>
             <p className="mt-2 text-xs text-[#777777] max-w-sm">
-              선택한 카테고리에 해당하는 작품이 아직 없습니다. 다른 카테고리를 선택하거나 관리자 페이지에서 새로운 작품을 등록하세요.
+              {t.photoView.emptyDesc}
             </p>
             {isAdmin && onGoToUpload ? (
               <button
                 onClick={onGoToUpload}
                 className="mt-6 border border-[#333333] bg-[#181818] px-5 py-2.5 text-xs font-mono-archive text-white hover:border-white"
               >
-                새 사진 등록하기
+                {t.photoView.uploadNewBtn}
               </button>
             ) : (
               <button
                 onClick={() => setSelectedCategory('ALL')}
                 className="mt-6 border border-[#333333] px-5 py-2 text-xs font-mono-archive text-[#aaaaaa] hover:text-white"
               >
-                전체 목록 보기
+                {t.photoView.viewAllBtn}
               </button>
             )}
           </div>

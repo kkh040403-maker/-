@@ -127,15 +127,68 @@ export async function testConnection() {
   }
 }
 
-// Upload file to Firebase Storage with base64/blob fallback
+// In-browser Canvas image compressor ensuring payload is web-optimized and under Firestore limits (~150-250KB)
+export async function compressImageFile(file: File, maxDim = 1600, quality = 0.82): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new window.Image();
+      img.onload = () => {
+        let width = img.naturalWidth || img.width;
+        let height = img.naturalHeight || img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(e.target?.result as string);
+          return;
+        }
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, width, height);
+
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        // If still large, slightly lower quality
+        if (dataUrl.length > 700000) {
+          dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+        }
+        resolve(dataUrl);
+      };
+      img.onerror = () => {
+        // Fallback to direct raw DataURL
+        resolve(e.target?.result as string);
+      };
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Upload file to Firebase Storage with web-optimized base64 fallback
 export async function uploadMediaFile(
   file: File,
   folder: 'photos' | 'videos' | 'thumbnails',
   onProgress?: (progress: number) => void
 ): Promise<string> {
-  const uniqueName = `${folder}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '')}`;
+  const isImage = file.type.startsWith('image/');
+
   if (storage) {
     try {
+      const uniqueName = `${folder}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '')}`;
       const storageRef = ref(storage, uniqueName);
       onProgress?.(30);
       const snapshot = await uploadBytes(storageRef, file);
@@ -144,8 +197,16 @@ export async function uploadMediaFile(
       onProgress?.(100);
       return downloadUrl;
     } catch (storageError) {
-      console.warn('Storage upload notice, falling back to local storage:', storageError);
+      console.warn('Storage upload notice, falling back to optimized inline data:', storageError);
     }
+  }
+
+  // If image, compress with canvas to stay well within Firestore doc size limit
+  if (isImage) {
+    onProgress?.(50);
+    const compressed = await compressImageFile(file);
+    onProgress?.(100);
+    return compressed;
   }
 
   // Convert to Data URL / Blob URL for client persistence

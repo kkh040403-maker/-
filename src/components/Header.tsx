@@ -252,12 +252,12 @@ export const Header: React.FC<HeaderProps> = ({
                   {isAdmin ? (
                     <>
                       <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                      ADMIN CONSOLE (ACTIVE)
+                      <span>{t.nav.adminActive}</span>
                     </>
                   ) : (
                     <>
                       <Lock className="h-3.5 w-3.5 text-[#777777]" />
-                      ADMIN ACCESS
+                      <span>{t.nav.adminAccess}</span>
                     </>
                   )}
                 </span>

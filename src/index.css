@@ -15,24 +15,26 @@
   body {
     background-color: #101010;
     color: #fafafa;
-    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    font-family: 'Pretendard Variable', Pretendard, 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
     letter-spacing: -0.015em;
     overflow-x: hidden;
   }
 
   /* Headlines & Editorial Brand */
   .font-display {
-    font-family: 'Syne', 'Space Grotesk', Pretendard, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    letter-spacing: -0.025em;
   }
 
   .font-heading {
-    font-family: 'Space Grotesk', 'Pretendard Variable', Pretendard, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+    letter-spacing: -0.02em;
   }
 
   /* Monospace Archive & Technical Specs */
   .font-mono-archive {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    letter-spacing: 0.04em;
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: 0.03em;
   }
 }
 

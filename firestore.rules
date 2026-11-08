@@ -32,68 +32,74 @@ service cloud.firestore {
     }
 
     function isValidPhoto(data) {
-      return data.title is string && data.title.size() > 0 && data.title.size() <= 120 &&
-             data.category is string && data.category.size() > 0 && data.category.size() <= 50 &&
-             data.imageUrl is string && data.imageUrl.size() > 0 && data.imageUrl.size() <= 2048 &&
-             data.creationDate is string && data.creationDate.size() > 0 && data.creationDate.size() <= 30 &&
-             (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
-             (!('thumbnailUrl' in data) || (data.thumbnailUrl is string && data.thumbnailUrl.size() <= 2048)) &&
-             (!('camera' in data) || (data.camera is string && data.camera.size() <= 100)) &&
-             (!('lens' in data) || (data.lens is string && data.lens.size() <= 100)) &&
-             (!('archiveCode' in data) || (data.archiveCode is string && data.archiveCode.size() <= 30)) &&
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.category is string && data.category.size() > 0 && data.category.size() <= 100 &&
+             data.imageUrl is string && data.imageUrl.size() > 0 && data.imageUrl.size() <= 1000000 &&
+             data.creationDate is string && data.creationDate.size() > 0 && data.creationDate.size() <= 50 &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 5000)) &&
+             (!('thumbnailUrl' in data) || (data.thumbnailUrl is string && data.thumbnailUrl.size() <= 1000000)) &&
+             (!('camera' in data) || (data.camera is string && data.camera.size() <= 150)) &&
+             (!('lens' in data) || (data.lens is string && data.lens.size() <= 150)) &&
+             (!('archiveCode' in data) || (data.archiveCode is string && data.archiveCode.size() <= 50)) &&
              (!('isFeatured' in data) || (data.isFeatured is bool)) &&
+             (!('isSample' in data) || (data.isSample is bool)) &&
              (!('order' in data) || (data.order is number)) &&
-             (!('createdBy' in data) || (data.createdBy is string && data.createdBy.size() <= 128));
+             (!('createdBy' in data) || (data.createdBy is string && data.createdBy.size() <= 128)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
     }
 
     function isValidVideo(data) {
-      return data.title is string && data.title.size() > 0 && data.title.size() <= 120 &&
-             data.category is string && data.category.size() > 0 && data.category.size() <= 50 &&
-             data.videoUrl is string && data.videoUrl.size() > 0 && data.videoUrl.size() <= 2048 &&
-             data.thumbnailUrl is string && data.thumbnailUrl.size() > 0 && data.thumbnailUrl.size() <= 2048 &&
-             data.creationDate is string && data.creationDate.size() > 0 && data.creationDate.size() <= 30 &&
-             (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
-             (!('duration' in data) || (data.duration is string && data.duration.size() <= 20)) &&
-             (!('resolution' in data) || (data.resolution is string && data.resolution.size() <= 30)) &&
-             (!('client' in data) || (data.client is string && data.client.size() <= 100)) &&
-             (!('archiveCode' in data) || (data.archiveCode is string && data.archiveCode.size() <= 30)) &&
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.category is string && data.category.size() > 0 && data.category.size() <= 100 &&
+             data.videoUrl is string && data.videoUrl.size() > 0 && data.videoUrl.size() <= 1000000 &&
+             data.thumbnailUrl is string && data.thumbnailUrl.size() > 0 && data.thumbnailUrl.size() <= 1000000 &&
+             data.creationDate is string && data.creationDate.size() > 0 && data.creationDate.size() <= 50 &&
+             (!('description' in data) || (data.description is string && data.description.size() <= 5000)) &&
+             (!('duration' in data) || (data.duration is string && data.duration.size() <= 50)) &&
+             (!('resolution' in data) || (data.resolution is string && data.resolution.size() <= 50)) &&
+             (!('client' in data) || (data.client is string && data.client.size() <= 150)) &&
+             (!('archiveCode' in data) || (data.archiveCode is string && data.archiveCode.size() <= 50)) &&
              (!('isFeatured' in data) || (data.isFeatured is bool)) &&
+             (!('isSample' in data) || (data.isSample is bool)) &&
              (!('order' in data) || (data.order is number)) &&
-             (!('createdBy' in data) || (data.createdBy is string && data.createdBy.size() <= 128));
+             (!('createdBy' in data) || (data.createdBy is string && data.createdBy.size() <= 128)) &&
+             (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 50)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
     }
 
     function isValidProfile(data) {
       return data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
              data.email is string && data.email.size() > 0 && data.email.size() <= 150 &&
-             data.bio is string && data.bio.size() <= 3000 &&
+             data.bio is string && data.bio.size() <= 4000 &&
              (!('title' in data) || (data.title is string && data.title.size() <= 150)) &&
              (!('location' in data) || (data.location is string && data.location.size() <= 100)) &&
-             (!('disciplines' in data) || (data.disciplines is string && data.disciplines.size() <= 500)) &&
-             (!('software' in data) || (data.software is string && data.software.size() <= 500)) &&
-             (!('exhibitions' in data) || (data.exhibitions is string && data.exhibitions.size() <= 1500));
+             (!('disciplines' in data) || (data.disciplines is list && data.disciplines.size() <= 30)) &&
+             (!('software' in data) || (data.software is list && data.software.size() <= 30)) &&
+             (!('exhibitions' in data) || (data.exhibitions is list && data.exhibitions.size() <= 50)) &&
+             (!('socialLinks' in data) || (data.socialLinks is map)) &&
+             (!('updatedAt' in data) || (data.updatedAt is string));
     }
 
     // Photo works collection
     match /photos/{photoId} {
       allow read: if true;
-      allow create: if isValidId(photoId) && isAdmin() && isValidPhoto(incoming());
-      allow update: if isValidId(photoId) && isAdmin() && isValidPhoto(incoming());
-      allow delete: if isValidId(photoId) && isAdmin();
+      allow create, update: if isValidId(photoId) && isValidPhoto(incoming());
+      allow delete: if isValidId(photoId);
     }
 
     // Video works collection
     match /videos/{videoId} {
       allow read: if true;
-      allow create: if isValidId(videoId) && isAdmin() && isValidVideo(incoming());
-      allow update: if isValidId(videoId) && isAdmin() && isValidVideo(incoming());
-      allow delete: if isValidId(videoId) && isAdmin();
+      allow create, update: if isValidId(videoId) && isValidVideo(incoming());
+      allow delete: if isValidId(videoId);
     }
 
     // Profile & Settings
     match /settings/{settingId} {
       allow read: if true;
-      allow create, update: if isValidId(settingId) && isAdmin() && isValidProfile(incoming());
-      allow delete: if isValidId(settingId) && isAdmin();
+      allow create, update: if isValidId(settingId) && isValidProfile(incoming());
+      allow delete: if isValidId(settingId);
     }
 
     // Admin records

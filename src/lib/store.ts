@@ -7,6 +7,7 @@ import {
   setDoc,
   deleteDoc,
   updateDoc,
+  onSnapshot,
 } from 'firebase/firestore';
 import {
   signInWithPopup,
@@ -137,66 +138,124 @@ export function useArchiveStore() {
     }
   }, []);
 
-  // Background Firestore sync
+  // Real-time Firestore synchronization across all devices and visitors
   useEffect(() => {
-    let isMounted = true;
-
-    async function syncFirestoreData() {
-      if (!db) return;
-      try {
-        setSyncStatus('syncing');
-
-        // Fetch Photos
-        const photoCol = collection(db, 'photos');
-        const photoSnap = await getDocs(photoCol);
-
-        if (isMounted && !photoSnap.empty) {
-          const remotePhotos: PhotoItem[] = [];
-          photoSnap.forEach((docSnap) => {
-            remotePhotos.push({ ...(docSnap.data() as PhotoItem), id: docSnap.id });
-          });
-          if (remotePhotos.length > 0) {
-            persistPhotosLocal(remotePhotos);
-          }
-        }
-
-        // Fetch Videos
-        const videoCol = collection(db, 'videos');
-        const videoSnap = await getDocs(videoCol);
-
-        if (isMounted && !videoSnap.empty) {
-          const remoteVideos: VideoItem[] = [];
-          videoSnap.forEach((docSnap) => {
-            remoteVideos.push({ ...(docSnap.data() as VideoItem), id: docSnap.id });
-          });
-          if (remoteVideos.length > 0) {
-            persistVideosLocal(remoteVideos);
-          }
-        }
-
-        // Fetch Profile
-        const profileDoc = doc(db, 'settings', 'profile');
-        const profileSnap = await getDoc(profileDoc);
-        if (isMounted && profileSnap.exists()) {
-          const remoteProfile = profileSnap.data() as ProfileData;
-          persistProfileLocal(remoteProfile);
-        }
-
-        if (isMounted) {
-          setSyncStatus('synced');
-        }
-      } catch (err) {
-        console.info('Using high-performance persistent local archive:', err);
-        if (isMounted) {
-          setSyncStatus('local');
-        }
-      }
+    if (!db) {
+      setSyncStatus('local');
+      return;
     }
 
-    syncFirestoreData();
+    setSyncStatus('syncing');
+
+    // Helper sorting function for gallery items
+    const sortPhotos = (list: PhotoItem[]) => {
+      return [...list].sort((a, b) => {
+        if (a.isFeatured && !b.isFeatured) return -1;
+        if (!a.isFeatured && b.isFeatured) return 1;
+        if (a.order !== undefined && b.order !== undefined) return a.order - b.order;
+        const dateA = a.createdAt || a.creationDate || '';
+        const dateB = b.createdAt || b.creationDate || '';
+        return dateB.localeCompare(dateA);
+      });
+    };
+
+    const sortVideos = (list: VideoItem[]) => {
+      return [...list].sort((a, b) => {
+        if (a.isFeatured && !b.isFeatured) return -1;
+        if (!a.isFeatured && b.isFeatured) return 1;
+        if (a.order !== undefined && b.order !== undefined) return a.order - b.order;
+        const dateA = a.createdAt || a.creationDate || '';
+        const dateB = b.createdAt || b.creationDate || '';
+        return dateB.localeCompare(dateA);
+      });
+    };
+
+    // 1. Real-time Photos listener
+    const photoCol = collection(db, 'photos');
+    const unsubscribePhotos = onSnapshot(
+      photoCol,
+      async (snapshot) => {
+        if (snapshot.empty) {
+          // If Firestore collection is empty, seed initial photos
+          console.info('Seeding initial photos to Firestore...');
+          for (const item of INITIAL_PHOTOS) {
+            try {
+              await setDoc(doc(db, 'photos', item.id), item);
+            } catch (e) {
+              console.warn('Seeding photo notice:', e);
+            }
+          }
+        } else {
+          const remoteList: PhotoItem[] = [];
+          snapshot.forEach((docSnap) => {
+            remoteList.push({ ...(docSnap.data() as PhotoItem), id: docSnap.id });
+          });
+          const sorted = sortPhotos(remoteList);
+          persistPhotosLocal(sorted);
+          setSyncStatus('synced');
+        }
+      },
+      (error) => {
+        console.warn('Real-time photos subscription notice:', error);
+        setSyncStatus('local');
+      }
+    );
+
+    // 2. Real-time Videos listener
+    const videoCol = collection(db, 'videos');
+    const unsubscribeVideos = onSnapshot(
+      videoCol,
+      async (snapshot) => {
+        if (snapshot.empty) {
+          console.info('Seeding initial videos to Firestore...');
+          for (const item of INITIAL_VIDEOS) {
+            try {
+              await setDoc(doc(db, 'videos', item.id), item);
+            } catch (e) {
+              console.warn('Seeding video notice:', e);
+            }
+          }
+        } else {
+          const remoteList: VideoItem[] = [];
+          snapshot.forEach((docSnap) => {
+            remoteList.push({ ...(docSnap.data() as VideoItem), id: docSnap.id });
+          });
+          const sorted = sortVideos(remoteList);
+          persistVideosLocal(sorted);
+          setSyncStatus('synced');
+        }
+      },
+      (error) => {
+        console.warn('Real-time videos subscription notice:', error);
+      }
+    );
+
+    // 3. Real-time Profile listener
+    const profileDocRef = doc(db, 'settings', 'profile');
+    const unsubscribeProfile = onSnapshot(
+      profileDocRef,
+      async (docSnap) => {
+        if (docSnap.exists()) {
+          const remoteProfile = docSnap.data() as ProfileData;
+          persistProfileLocal(remoteProfile);
+        } else {
+          // Seed profile document
+          try {
+            await setDoc(profileDocRef, INITIAL_PROFILE);
+          } catch (e) {
+            console.warn('Seeding profile notice:', e);
+          }
+        }
+      },
+      (error) => {
+        console.warn('Real-time profile subscription notice:', error);
+      }
+    );
 
     return () => {
-      isMounted = false;
+      unsubscribePhotos();
+      unsubscribeVideos();
+      unsubscribeProfile();
     };
   }, []);
 
@@ -267,17 +326,22 @@ export function useArchiveStore() {
   };
 
   const updatePhoto = async (id: string, updates: Partial<PhotoItem>) => {
-    const updated = photos.map((item) =>
-      item.id === id
-        ? { ...item, ...updates, updatedAt: new Date().toISOString(), isSample: false }
-        : item
-    );
+    const existing = photos.find((item) => item.id === id);
+    const updatedItem: PhotoItem = {
+      ...(existing || ({} as PhotoItem)),
+      ...updates,
+      id,
+      updatedAt: new Date().toISOString(),
+      isSample: false,
+    };
+
+    const updated = photos.map((item) => (item.id === id ? updatedItem : item));
     persistPhotosLocal(updated);
 
     if (db) {
       try {
         const docRef = doc(db, 'photos', id);
-        await updateDoc(docRef, { ...updates, updatedAt: new Date().toISOString() });
+        await setDoc(docRef, updatedItem, { merge: true });
       } catch (err) {
         handleFirestoreError(err, OperationType.UPDATE, `photos/${id}`);
       }
@@ -324,17 +388,22 @@ export function useArchiveStore() {
   };
 
   const updateVideo = async (id: string, updates: Partial<VideoItem>) => {
-    const updated = videos.map((item) =>
-      item.id === id
-        ? { ...item, ...updates, updatedAt: new Date().toISOString(), isSample: false }
-        : item
-    );
+    const existing = videos.find((item) => item.id === id);
+    const updatedItem: VideoItem = {
+      ...(existing || ({} as VideoItem)),
+      ...updates,
+      id,
+      updatedAt: new Date().toISOString(),
+      isSample: false,
+    };
+
+    const updated = videos.map((item) => (item.id === id ? updatedItem : item));
     persistVideosLocal(updated);
 
     if (db) {
       try {
         const docRef = doc(db, 'videos', id);
-        await updateDoc(docRef, { ...updates, updatedAt: new Date().toISOString() });
+        await setDoc(docRef, updatedItem, { merge: true });
       } catch (err) {
         handleFirestoreError(err, OperationType.UPDATE, `videos/${id}`);
       }

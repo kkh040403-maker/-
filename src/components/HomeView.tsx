@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { PhotoItem, VideoItem, PageTab } from '../types';
-import { useLanguage } from '../lib/i18n';
-import { ArrowRight, Play, Eye, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { useLanguage, getCategoryLabel } from '../lib/i18n';
+import { ArrowRight, Play, Eye, Volume2, VolumeX } from 'lucide-react';
 
 interface HomeViewProps {
   photos: PhotoItem[];
@@ -20,7 +20,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onSelectVideo,
 }) => {
   const [videoMuted, setVideoMuted] = useState(true);
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
 
   // Pick primary featured video or photo
   const featuredVideo = videos.find((v) => v.isFeatured) || videos[0];
@@ -89,11 +89,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <div className="absolute bottom-6 left-6 right-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end lg:bottom-10 lg:left-10 lg:right-10">
                     <div>
                       <div className="flex items-center gap-2 font-mono-archive text-[11px] text-[#888888] tracking-widest">
-                        <span>FEATURED VISUAL</span>
+                        <span>{t.home.featuredVisual}</span>
                         <span>•</span>
                         <span>{featuredVideo.archiveCode || 'CINE'}</span>
                         <span>•</span>
-                        <span>{featuredVideo.category}</span>
+                        <span>{getCategoryLabel(featuredVideo.category, language)}</span>
                       </div>
                       <h2 className="mt-1 text-2xl font-bold tracking-tight text-white lg:text-3xl">
                         {featuredVideo.title}
@@ -104,7 +104,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       <button
                         onClick={() => setVideoMuted(!videoMuted)}
                         className="rounded-full border border-white/20 bg-black/60 p-3 text-white backdrop-blur-md transition-all hover:bg-black/90 hover:border-white/50"
-                        title={videoMuted ? '음소거 해제' : '음소거'}
+                        title={videoMuted ? t.home.unmute : t.home.mute}
                       >
                         {videoMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                       </button>
@@ -113,7 +113,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                         className="flex items-center gap-2 rounded-xs border border-white bg-white px-5 py-3 text-xs font-mono-archive tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
                       >
                         <Play className="h-3.5 w-3.5 fill-current" />
-                        <span>FULL THEATER</span>
+                        <span>{t.home.fullTheater}</span>
                       </button>
                     </div>
                   </div>
@@ -131,7 +131,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <div className="absolute inset-0 bg-gradient-to-t from-[#101010] via-transparent to-transparent opacity-70" />
                   <div className="absolute bottom-8 left-8 right-8">
                     <div className="font-mono-archive text-xs text-[#888888]">
-                      FEATURED PHOTOGRAPHY
+                      {t.home.featuredPhoto}
                     </div>
                     <div className="mt-1 text-2xl font-bold text-white">
                       {featuredPhoto.title}
@@ -232,7 +232,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <div className="p-4">
                   <div className="flex items-center justify-between text-[11px] font-mono-archive text-[#666666]">
                     <span>{photo.archiveCode || 'ARCH-P'}</span>
-                    <span>{photo.category}</span>
+                    <span>{getCategoryLabel(photo.category, language)}</span>
                   </div>
                   <h3 className="mt-1.5 truncate text-sm font-semibold text-[#f0f0f0] group-hover:text-white">
                     {photo.title}
@@ -241,7 +241,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     <span>{photo.creationDate}</span>
                     <span className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity text-[#999999]">
                       <Eye className="h-3 w-3" />
-                      VIEW
+                      {t.home.view}
                     </span>
                   </div>
                 </div>
@@ -254,7 +254,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               onClick={() => onSelectTab('PHOTO')}
               className="inline-flex items-center gap-2 border border-[#333333] px-6 py-3 text-xs font-mono-archive text-[#cccccc]"
             >
-              <span>VIEW ALL PHOTOS</span>
+              <span>{t.home.viewAllPhotos}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -336,7 +336,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <div className="p-5">
                   <div className="flex items-center justify-between text-[11px] font-mono-archive text-[#666666]">
                     <span>{video.archiveCode || 'CINE-V'}</span>
-                    <span>{video.category}</span>
+                    <span>{getCategoryLabel(video.category, language)}</span>
                   </div>
                   <h3 className="mt-2 text-lg font-bold text-white group-hover:text-white">
                     {video.title}
@@ -348,7 +348,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   )}
                   <div className="mt-4 flex items-center justify-between border-t border-[#1f1f1f] pt-3 text-[11px] font-mono-archive text-[#555555]">
                     <span>{video.creationDate}</span>
-                    <span>{video.client || 'INDEPENDENT ARCHIVE'}</span>
+                    <span>{video.client || t.home.independentArchive}</span>
                   </div>
                 </div>
               </motion.div>

@@ -59,7 +59,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
           </p>
           <div className="mt-4 flex items-center gap-2 text-xs font-mono-archive text-[#666666]">
             <MapPin className="h-3.5 w-3.5" />
-            <span>BASE: {profile.location}</span>
+            <span>{t.aboutView.base}: {profile.location}</span>
           </div>
         </div>
 
