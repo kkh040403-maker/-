@@ -1074,9 +1074,9 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       </button>
 
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (confirm(`정말로 "${item.title}" 사진을 삭제하시겠습니까?`)) {
-                            onDeletePhoto(item.id);
+                            await onDeletePhoto(item.id);
                             showFeedback('success', `사진 "${item.title}"이(가) 삭제되었습니다.`);
                           }
                         }}
@@ -1157,9 +1157,9 @@ export const AdminView: React.FC<AdminViewProps> = ({
                       </button>
 
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (confirm(`정말로 "${item.title}" 영상을 삭제하시겠습니까?`)) {
-                            onDeleteVideo(item.id);
+                            await onDeleteVideo(item.id);
                             showFeedback('success', `영상 "${item.title}"이(가) 삭제되었습니다.`);
                           }
                         }}

@@ -42,31 +42,31 @@ export function useArchiveStore() {
     }
   });
 
-  // Synchronously initialize state from localStorage or default samples to prevent any blank initial render
+  // Synchronously initialize state from localStorage to prevent flash of content
   const [photos, setPhotos] = useState<PhotoItem[]>(() => {
     try {
       const stored = localStorage.getItem(LOCAL_STORAGE_PHOTOS_KEY);
-      if (stored) {
+      if (stored !== null) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {
       console.warn('Photos read error:', e);
     }
-    return INITIAL_PHOTOS;
+    return [];
   });
 
   const [videos, setVideos] = useState<VideoItem[]>(() => {
     try {
       const stored = localStorage.getItem(LOCAL_STORAGE_VIDEOS_KEY);
-      if (stored) {
+      if (stored !== null) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {
       console.warn('Videos read error:', e);
     }
-    return INITIAL_VIDEOS;
+    return [];
   });
 
   const [profile, setProfile] = useState<ProfileData>(() => {
@@ -174,26 +174,14 @@ export function useArchiveStore() {
     const photoCol = collection(db, 'photos');
     const unsubscribePhotos = onSnapshot(
       photoCol,
-      async (snapshot) => {
-        if (snapshot.empty) {
-          // If Firestore collection is empty, seed initial photos
-          console.info('Seeding initial photos to Firestore...');
-          for (const item of INITIAL_PHOTOS) {
-            try {
-              await setDoc(doc(db, 'photos', item.id), item);
-            } catch (e) {
-              console.warn('Seeding photo notice:', e);
-            }
-          }
-        } else {
-          const remoteList: PhotoItem[] = [];
-          snapshot.forEach((docSnap) => {
-            remoteList.push({ ...(docSnap.data() as PhotoItem), id: docSnap.id });
-          });
-          const sorted = sortPhotos(remoteList);
-          persistPhotosLocal(sorted);
-          setSyncStatus('synced');
-        }
+      (snapshot) => {
+        const remoteList: PhotoItem[] = [];
+        snapshot.forEach((docSnap) => {
+          remoteList.push({ ...(docSnap.data() as PhotoItem), id: docSnap.id });
+        });
+        const sorted = sortPhotos(remoteList);
+        persistPhotosLocal(sorted);
+        setSyncStatus('synced');
       },
       (error) => {
         console.warn('Real-time photos subscription notice:', error);
@@ -205,25 +193,14 @@ export function useArchiveStore() {
     const videoCol = collection(db, 'videos');
     const unsubscribeVideos = onSnapshot(
       videoCol,
-      async (snapshot) => {
-        if (snapshot.empty) {
-          console.info('Seeding initial videos to Firestore...');
-          for (const item of INITIAL_VIDEOS) {
-            try {
-              await setDoc(doc(db, 'videos', item.id), item);
-            } catch (e) {
-              console.warn('Seeding video notice:', e);
-            }
-          }
-        } else {
-          const remoteList: VideoItem[] = [];
-          snapshot.forEach((docSnap) => {
-            remoteList.push({ ...(docSnap.data() as VideoItem), id: docSnap.id });
-          });
-          const sorted = sortVideos(remoteList);
-          persistVideosLocal(sorted);
-          setSyncStatus('synced');
-        }
+      (snapshot) => {
+        const remoteList: VideoItem[] = [];
+        snapshot.forEach((docSnap) => {
+          remoteList.push({ ...(docSnap.data() as VideoItem), id: docSnap.id });
+        });
+        const sorted = sortVideos(remoteList);
+        persistVideosLocal(sorted);
+        setSyncStatus('synced');
       },
       (error) => {
         console.warn('Real-time videos subscription notice:', error);
@@ -437,11 +414,25 @@ export function useArchiveStore() {
     }
   };
 
-  // Reset to initial sample data
-  const resetToSampleData = () => {
+  // Reset to initial sample data (Only triggered when admin explicitly clicks manual reset in Admin Console)
+  const resetToSampleData = async () => {
     persistPhotosLocal(INITIAL_PHOTOS);
     persistVideosLocal(INITIAL_VIDEOS);
     persistProfileLocal(INITIAL_PROFILE);
+
+    if (db) {
+      try {
+        for (const item of INITIAL_PHOTOS) {
+          await setDoc(doc(db, 'photos', item.id), item);
+        }
+        for (const item of INITIAL_VIDEOS) {
+          await setDoc(doc(db, 'videos', item.id), item);
+        }
+        await setDoc(doc(db, 'settings', 'profile'), INITIAL_PROFILE);
+      } catch (e) {
+        console.warn('Manual reset sample notice:', e);
+      }
+    }
   };
 
   return {
