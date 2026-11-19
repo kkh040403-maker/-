@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { PhotoItem } from '../types';
 import { useLanguage, getCategoryLabel } from '../lib/i18n';
-import { Filter, Eye, Camera, Plus } from 'lucide-react';
+import { Filter, Eye, Camera, Plus, Minimize2, Maximize2 } from 'lucide-react';
 
 interface PhotoViewProps {
   photos: PhotoItem[];
@@ -18,6 +18,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
   isAdmin = false,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [viewMode, setViewMode] = useState<'fit' | 'fill'>('fit');
   const { language, t } = useLanguage();
 
   // Extract unique categories
@@ -41,7 +42,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
         {/* Page Header */}
         <div className="flex flex-col justify-between gap-6 border-b border-[#222222] pb-8 md:flex-row md:items-end">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono-archive tracking-[0.25em] text-[#777777]">
+            <div className="flex items-center gap-2 text-xs font-medium tracking-wider text-[#777777]">
               <span>{t.photoView.tag}</span>
               <span>•</span>
               <span>{photos.length} {t.photoView.archivedFramesSuffix}</span>
@@ -57,7 +58,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
           {isAdmin && onGoToUpload && (
             <button
               onClick={onGoToUpload}
-              className="inline-flex items-center gap-2 border border-white bg-white px-5 py-3 text-xs font-mono-archive font-semibold tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
+              className="inline-flex items-center gap-2 border border-white bg-white px-5 py-3 text-xs font-semibold tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
             >
               <Plus className="h-4 w-4" />
               <span>{t.photoView.uploadBtn}</span>
@@ -65,42 +66,77 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
           )}
         </div>
 
-        {/* Category Filter Tabs */}
-        <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-[#1c1c1c] pb-6">
-          <div className="mr-3 flex items-center gap-1.5 text-xs font-mono-archive text-[#555555]">
-            <Filter className="h-3.5 w-3.5" />
-            <span>{t.photoView.filterLabel}:</span>
+        {/* Filter and View Mode Controls Bar */}
+        <div className="mt-8 flex flex-col gap-4 border-b border-[#1c1c1c] pb-6 sm:flex-row sm:items-center sm:justify-between">
+          {/* Category Filter Tabs */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="mr-2 flex items-center gap-1.5 text-xs font-medium text-[#666666]">
+              <Filter className="h-3.5 w-3.5" />
+              <span>{t.photoView.filterLabel}:</span>
+            </div>
+            {categories.map((cat) => {
+              const isSelected = selectedCategory === cat;
+              const count =
+                cat === 'ALL'
+                  ? photos.length
+                  : photos.filter((p) => p.category.toLowerCase() === cat.toLowerCase()).length;
+              const localizedLabel = getCategoryLabel(cat, language);
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`rounded-xs px-3.5 py-1.5 text-xs font-medium transition-all ${
+                    isSelected
+                      ? 'bg-white text-black font-semibold'
+                      : 'bg-[#181818] text-[#888888] hover:bg-[#222222] hover:text-[#cccccc]'
+                  }`}
+                >
+                  <span>{localizedLabel}</span>
+                  <span className={`ml-1.5 text-[10px] ${isSelected ? 'text-[#555555]' : 'text-[#555555]'}`}>
+                    ({count})
+                  </span>
+                </button>
+              );
+            })}
           </div>
-          {categories.map((cat) => {
-            const isSelected = selectedCategory === cat;
-            const count =
-              cat === 'ALL'
-                ? photos.length
-                : photos.filter((p) => p.category.toLowerCase() === cat.toLowerCase()).length;
-            const localizedLabel = getCategoryLabel(cat, language);
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`rounded-xs px-3.5 py-1.5 text-xs font-mono-archive tracking-wider transition-all ${
-                  isSelected
-                    ? 'bg-white text-black font-semibold'
-                    : 'bg-[#181818] text-[#888888] hover:bg-[#222222] hover:text-[#cccccc]'
-                }`}
-              >
-                <span>{localizedLabel}</span>
-                <span className={`ml-1.5 text-[10px] ${isSelected ? 'text-[#555555]' : 'text-[#555555]'}`}>
-                  ({count})
-                </span>
-              </button>
-            );
-          })}
+
+          {/* View Mode Toggle: Fit (Original Framing) vs Fill (Uniform Grid) */}
+          <div className="flex items-center gap-1 self-start rounded-xs border border-[#242424] bg-[#141414] p-1 text-xs sm:self-auto">
+            <button
+              type="button"
+              onClick={() => setViewMode('fit')}
+              className={`flex items-center gap-1.5 rounded-xs px-3 py-1.5 font-medium transition-colors ${
+                viewMode === 'fit'
+                  ? 'bg-white text-black font-semibold shadow-xs'
+                  : 'text-[#888888] hover:text-white'
+              }`}
+              title={t.photoView.fitMode}
+            >
+              <Minimize2 className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{t.photoView.fitMode}</span>
+              <span className="sm:hidden">FIT (원본)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('fill')}
+              className={`flex items-center gap-1.5 rounded-xs px-3 py-1.5 font-medium transition-colors ${
+                viewMode === 'fill'
+                  ? 'bg-white text-black font-semibold shadow-xs'
+                  : 'text-[#888888] hover:text-white'
+              }`}
+              title={t.photoView.fillMode}
+            >
+              <Maximize2 className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{t.photoView.fillMode}</span>
+              <span className="sm:hidden">FILL (채우기)</span>
+            </button>
+          </div>
         </div>
 
         {/* Photos Grid with Staggered Cascade Motion */}
         {filteredPhotos.length > 0 ? (
           <motion.div
-            key={selectedCategory}
+            key={`${selectedCategory}-${viewMode}`}
             initial="hidden"
             animate="show"
             variants={{
@@ -132,34 +168,65 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
                 onClick={() => onSelectPhoto(photo)}
                 className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-colors duration-300 hover:border-[#4f4f4f]"
               >
-                {/* Photo Image Aspect */}
-                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#181818]">
-                  <img
-                    src={photo.thumbnailUrl || photo.imageUrl}
-                    alt={photo.title}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  />
-                  {/* Subtle hover gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#101010]/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                {/* Photo Image Stage: Fit (no cropping) vs Fill (cover) */}
+                {viewMode === 'fit' ? (
+                  <div className="relative aspect-[4/3] sm:aspect-[4/5] w-full overflow-hidden bg-[#0c0c0c] flex items-center justify-center p-2">
+                    {/* Atmospheric ambient backdrop glow */}
+                    <div
+                      className="absolute inset-0 bg-cover bg-center blur-2xl opacity-20 scale-125 pointer-events-none"
+                      style={{ backgroundImage: `url(${photo.thumbnailUrl || photo.imageUrl})` }}
+                    />
+                    <img
+                      src={photo.thumbnailUrl || photo.imageUrl}
+                      alt={photo.title}
+                      loading="lazy"
+                      className="relative z-10 max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-500 ease-out group-hover:scale-[1.02] shadow-xl"
+                    />
+                    {/* Subtle hover gradient */}
+                    <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#101010]/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-                  {/* Corner Badge */}
-                  <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                    {photo.isSample ? (
-                      <span className="rounded bg-black/60 px-2 py-0.5 font-mono-archive text-[10px] text-[#888888] backdrop-blur-sm">
-                        {t.photoView.sampleBadge}
-                      </span>
-                    ) : (
-                      <span className="rounded border border-[#3b82f6]/40 bg-[#1e293b]/80 px-2 py-0.5 font-mono-archive text-[10px] text-[#93c5fd] backdrop-blur-sm">
-                        {t.photoView.originalBadge}
-                      </span>
-                    )}
+                    {/* Corner Badge */}
+                    <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5">
+                      {photo.isSample ? (
+                        <span className="rounded bg-black/70 px-2 py-0.5 text-[10px] font-medium text-[#888888] backdrop-blur-sm border border-white/10">
+                          {t.photoView.sampleBadge}
+                        </span>
+                      ) : (
+                        <span className="rounded border border-[#3b82f6]/40 bg-[#1e293b]/90 px-2 py-0.5 text-[10px] font-medium text-[#93c5fd] backdrop-blur-sm">
+                          {t.photoView.originalBadge}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="relative aspect-[4/3] sm:aspect-[4/5] w-full overflow-hidden bg-[#181818]">
+                    <img
+                      src={photo.thumbnailUrl || photo.imageUrl}
+                      alt={photo.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                    {/* Subtle hover gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#101010]/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                    {/* Corner Badge */}
+                    <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                      {photo.isSample ? (
+                        <span className="rounded bg-black/60 px-2 py-0.5 text-[10px] font-medium text-[#888888] backdrop-blur-sm">
+                          {t.photoView.sampleBadge}
+                        </span>
+                      ) : (
+                        <span className="rounded border border-[#3b82f6]/40 bg-[#1e293b]/80 px-2 py-0.5 text-[10px] font-medium text-[#93c5fd] backdrop-blur-sm">
+                          {t.photoView.originalBadge}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Metadata Card Footer */}
                 <div className="p-5">
-                  <div className="flex items-center justify-between text-[11px] font-mono-archive text-[#666666]">
+                  <div className="flex items-center justify-between text-[11px] font-medium text-[#666666]">
                     <span>{photo.archiveCode || 'ARCH-P'}</span>
                     <span className="rounded bg-[#1c1c1c] px-2 py-0.5 text-[#999999]">
                       {getCategoryLabel(photo.category, language)}
@@ -176,7 +243,7 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
                     </p>
                   )}
 
-                  <div className="mt-4 flex items-center justify-between border-t border-[#1f1f1f] pt-3 text-[11px] font-mono-archive text-[#555555]">
+                  <div className="mt-4 flex items-center justify-between border-t border-[#1f1f1f] pt-3 text-[11px] text-[#555555]">
                     <span>{photo.creationDate}</span>
                     <span className="flex items-center gap-1 text-[#aaaaaa] opacity-80 group-hover:opacity-100">
                       <Eye className="h-3 w-3" />
@@ -198,14 +265,14 @@ export const PhotoView: React.FC<PhotoViewProps> = ({
             {isAdmin && onGoToUpload ? (
               <button
                 onClick={onGoToUpload}
-                className="mt-6 border border-[#333333] bg-[#181818] px-5 py-2.5 text-xs font-mono-archive text-white hover:border-white"
+                className="mt-6 border border-[#333333] bg-[#181818] px-5 py-2.5 text-xs font-medium text-white hover:border-white"
               >
                 {t.photoView.uploadNewBtn}
               </button>
             ) : (
               <button
                 onClick={() => setSelectedCategory('ALL')}
-                className="mt-6 border border-[#333333] px-5 py-2 text-xs font-mono-archive text-[#aaaaaa] hover:text-white"
+                className="mt-6 border border-[#333333] px-5 py-2 text-xs font-medium text-[#aaaaaa] hover:text-white"
               >
                 {t.photoView.viewAllBtn}
               </button>

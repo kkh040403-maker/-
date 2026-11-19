@@ -38,7 +38,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* Manifesto / Title Header */}
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-8">
-              <div className="flex items-center gap-3 text-xs font-mono-archive tracking-[0.25em] text-[#888888]">
+              <div className="flex items-center gap-2.5 text-xs font-medium text-[#888888] tracking-wider">
                 <span className="inline-block h-2 w-2 rounded-full bg-white animate-pulse" />
                 <span>{t.home.tag}</span>
               </div>
@@ -53,14 +53,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="flex flex-col gap-3 sm:flex-row lg:col-span-4 lg:justify-end">
               <button
                 onClick={() => onSelectTab('PHOTO')}
-                className="group flex items-center justify-center gap-3 border border-[#333333] bg-[#181818] px-6 py-4 text-xs font-mono-archive tracking-widest text-white transition-all hover:border-white hover:bg-white hover:text-black"
+                className="group flex items-center justify-center gap-2.5 border border-[#333333] bg-[#181818] px-6 py-3.5 text-xs font-semibold text-white transition-all hover:border-white hover:bg-white hover:text-black"
               >
                 <span>{t.home.explorePhoto}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </button>
               <button
                 onClick={() => onSelectTab('VIDEO')}
-                className="group flex items-center justify-center gap-3 border border-[#222222] bg-transparent px-6 py-4 text-xs font-mono-archive tracking-widest text-[#aaaaaa] transition-all hover:border-[#666666] hover:text-white"
+                className="group flex items-center justify-center gap-2.5 border border-[#222222] bg-transparent px-6 py-3.5 text-xs font-semibold text-[#aaaaaa] transition-all hover:border-[#666666] hover:text-white"
               >
                 <Play className="h-3.5 w-3.5 fill-current" />
                 <span>{t.home.watchCinema}</span>
@@ -88,7 +88,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   {/* Stage Overlays */}
                   <div className="absolute bottom-6 left-6 right-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end lg:bottom-10 lg:left-10 lg:right-10">
                     <div>
-                      <div className="flex items-center gap-2 font-mono-archive text-[11px] text-[#888888] tracking-widest">
+                      <div className="flex items-center gap-2 text-[11px] font-medium text-[#888888]">
                         <span>{t.home.featuredVisual}</span>
                         <span>•</span>
                         <span>{featuredVideo.archiveCode || 'CINE'}</span>
@@ -110,7 +110,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       </button>
                       <button
                         onClick={() => onSelectVideo(featuredVideo)}
-                        className="flex items-center gap-2 rounded-xs border border-white bg-white px-5 py-3 text-xs font-mono-archive tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
+                        className="flex items-center gap-2 rounded-xs border border-white bg-white px-5 py-3 text-xs font-semibold text-black transition-all hover:bg-[#e4e4e7]"
                       >
                         <Play className="h-3.5 w-3.5 fill-current" />
                         <span>{t.home.fullTheater}</span>
@@ -121,16 +121,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
               ) : featuredPhoto ? (
                 <div
                   onClick={() => onSelectPhoto(featuredPhoto)}
-                  className="relative h-full w-full cursor-pointer"
+                  className="relative h-full w-full cursor-pointer flex items-center justify-center overflow-hidden bg-[#0c0c0c]"
                 >
+                  {/* Atmospheric ambient backdrop */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center blur-2xl opacity-30 scale-125 pointer-events-none"
+                    style={{ backgroundImage: `url(${featuredPhoto.imageUrl})` }}
+                  />
                   <img
                     src={featuredPhoto.imageUrl}
                     alt={featuredPhoto.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="relative z-10 max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-700 group-hover:scale-[1.02] shadow-2xl"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#101010] via-transparent to-transparent opacity-70" />
-                  <div className="absolute bottom-8 left-8 right-8">
-                    <div className="font-mono-archive text-xs text-[#888888]">
+                  <div className="absolute inset-0 z-15 bg-gradient-to-t from-[#101010] via-transparent to-transparent opacity-75" />
+                  <div className="absolute bottom-6 left-6 right-6 z-20 sm:bottom-8 sm:left-8 sm:right-8">
+                    <div className="text-xs font-medium text-[#888888]">
                       {t.home.featuredPhoto}
                     </div>
                     <div className="mt-1 text-2xl font-bold text-white">
@@ -142,31 +147,34 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
 
-          {/* Quick Technical Matrix Bar */}
-          <div className="mt-8 grid grid-cols-2 gap-4 border border-[#1f1f1f] bg-[#141414] p-6 font-mono-archive text-xs text-[#888888] sm:grid-cols-4">
+          {/* Quick Technical Matrix Bar - Clean Unified Typography */}
+          <div className="mt-8 grid grid-cols-2 gap-4 border border-[#1f1f1f] bg-[#141414] p-6 text-xs text-[#888888] sm:grid-cols-4">
             <div>
-              <span className="text-[#555555] block text-[10px] uppercase">{t.home.totalArchive}</span>
-              <span className="mt-1 text-white font-semibold text-sm">
-                {(photos.length + videos.length).toString().padStart(2, '0')} {t.home.works}
-              </span>
+              <span className="text-[#666666] block text-[11px] font-medium uppercase tracking-wider">{t.home.totalArchive}</span>
+              <div className="mt-1.5 flex items-baseline gap-1 text-white font-bold text-base tracking-tight">
+                {(photos.length + videos.length).toString().padStart(2, '0')}
+                <span className="text-xs font-normal text-[#999999]">{t.home.works}</span>
+              </div>
             </div>
             <div>
-              <span className="text-[#555555] block text-[10px] uppercase">{t.home.stillPhotography}</span>
-              <span className="mt-1 text-white font-semibold text-sm">
-                {photos.length.toString().padStart(2, '0')} {t.home.frames}
-              </span>
+              <span className="text-[#666666] block text-[11px] font-medium uppercase tracking-wider">{t.home.stillPhotography}</span>
+              <div className="mt-1.5 flex items-baseline gap-1 text-white font-bold text-base tracking-tight">
+                {photos.length.toString().padStart(2, '0')}
+                <span className="text-xs font-normal text-[#999999]">{t.home.frames}</span>
+              </div>
             </div>
             <div>
-              <span className="text-[#555555] block text-[10px] uppercase">{t.home.cinematography}</span>
-              <span className="mt-1 text-white font-semibold text-sm">
-                {videos.length.toString().padStart(2, '0')} {t.home.films}
-              </span>
+              <span className="text-[#666666] block text-[11px] font-medium uppercase tracking-wider">{t.home.cinematography}</span>
+              <div className="mt-1.5 flex items-baseline gap-1 text-white font-bold text-base tracking-tight">
+                {videos.length.toString().padStart(2, '0')}
+                <span className="text-xs font-normal text-[#999999]">{t.home.films}</span>
+              </div>
             </div>
             <div>
-              <span className="text-[#555555] block text-[10px] uppercase">{t.home.monochrome}</span>
-              <span className="mt-1 text-white font-semibold text-sm">
+              <span className="text-[#666666] block text-[11px] font-medium uppercase tracking-wider">{t.home.monochrome}</span>
+              <div className="mt-1.5 text-white font-bold text-base tracking-tight">
                 4K UHD / RAW
-              </span>
+              </div>
             </div>
           </div>
         </div>
@@ -177,7 +185,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="mx-auto max-w-7xl">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-xs font-mono-archive tracking-widest text-[#777777]">
+              <div className="text-xs font-medium text-[#777777] tracking-wider">
                 {t.home.recentPhotosTitle}
               </div>
               <h2 className="mt-2 text-2xl font-bold font-heading tracking-tight text-white lg:text-3xl">
@@ -186,7 +194,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
             <button
               onClick={() => onSelectTab('PHOTO')}
-              className="hidden sm:flex items-center gap-2 text-xs font-mono-archive tracking-wider text-[#888888] hover:text-white transition-colors"
+              className="hidden sm:flex items-center gap-2 text-xs font-medium text-[#888888] hover:text-white transition-colors"
             >
               <span>{t.home.viewAllPhotos} ({photos.length})</span>
               <ArrowRight className="h-4 w-4" />
@@ -221,23 +229,28 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 onClick={() => onSelectPhoto(photo)}
                 className="group relative cursor-pointer overflow-hidden rounded-xs border border-[#202020] bg-[#141414] transition-colors hover:border-[#444444]"
               >
-                <div className="aspect-[4/5] w-full overflow-hidden bg-[#181818]">
+                <div className="relative aspect-[4/3] sm:aspect-[4/5] w-full overflow-hidden bg-[#0c0c0c] flex items-center justify-center p-1.5">
+                  <div
+                    className="absolute inset-0 bg-cover bg-center blur-xl opacity-20 scale-125 pointer-events-none"
+                    style={{ backgroundImage: `url(${photo.thumbnailUrl || photo.imageUrl})` }}
+                  />
                   <img
                     src={photo.thumbnailUrl || photo.imageUrl}
                     alt={photo.title}
                     loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="relative z-10 max-h-full max-w-full w-auto h-auto object-contain transition-transform duration-500 group-hover:scale-105 shadow-xl"
                   />
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#101010]/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
                 <div className="p-4">
-                  <div className="flex items-center justify-between text-[11px] font-mono-archive text-[#666666]">
+                  <div className="flex items-center justify-between text-[11px] font-medium text-[#666666]">
                     <span>{photo.archiveCode || 'ARCH-P'}</span>
                     <span>{getCategoryLabel(photo.category, language)}</span>
                   </div>
                   <h3 className="mt-1.5 truncate text-sm font-semibold text-[#f0f0f0] group-hover:text-white">
                     {photo.title}
                   </h3>
-                  <div className="mt-2 flex items-center justify-between text-[11px] font-mono-archive text-[#555555]">
+                  <div className="mt-2 flex items-center justify-between text-[11px] text-[#555555]">
                     <span>{photo.creationDate}</span>
                     <span className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity text-[#999999]">
                       <Eye className="h-3 w-3" />
@@ -252,7 +265,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div className="mt-8 text-center sm:hidden">
             <button
               onClick={() => onSelectTab('PHOTO')}
-              className="inline-flex items-center gap-2 border border-[#333333] px-6 py-3 text-xs font-mono-archive text-[#cccccc]"
+              className="inline-flex items-center gap-2 border border-[#333333] px-6 py-3 text-xs font-medium text-[#cccccc]"
             >
               <span>{t.home.viewAllPhotos}</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -266,7 +279,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="mx-auto max-w-7xl">
           <div className="flex items-end justify-between">
             <div>
-              <div className="text-xs font-mono-archive tracking-widest text-[#777777]">
+              <div className="text-xs font-medium text-[#777777] tracking-wider">
                 {t.home.recentVideosTitle}
               </div>
               <h2 className="mt-2 text-2xl font-bold font-heading tracking-tight text-white lg:text-3xl">
@@ -275,7 +288,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
             <button
               onClick={() => onSelectTab('VIDEO')}
-              className="hidden sm:flex items-center gap-2 text-xs font-mono-archive tracking-wider text-[#888888] hover:text-white transition-colors"
+              className="hidden sm:flex items-center gap-2 text-xs font-medium text-[#888888] hover:text-white transition-colors"
             >
               <span>{t.home.viewAllVideos} ({videos.length})</span>
               <ArrowRight className="h-4 w-4" />
@@ -322,19 +335,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     </div>
                   </div>
                   {video.duration && (
-                    <div className="absolute bottom-3 right-3 rounded bg-black/80 px-2 py-0.5 font-mono-archive text-[11px] text-white">
+                    <div className="absolute bottom-3 right-3 rounded bg-black/80 px-2 py-0.5 text-[11px] font-medium text-white">
                       {video.duration}
                     </div>
                   )}
                   {video.resolution && (
-                    <div className="absolute top-3 left-3 rounded border border-white/20 bg-black/60 px-2 py-0.5 font-mono-archive text-[10px] text-[#cccccc]">
+                    <div className="absolute top-3 left-3 rounded border border-white/20 bg-black/60 px-2 py-0.5 text-[10px] font-medium text-[#cccccc]">
                       {video.resolution}
                     </div>
                   )}
                 </div>
 
                 <div className="p-5">
-                  <div className="flex items-center justify-between text-[11px] font-mono-archive text-[#666666]">
+                  <div className="flex items-center justify-between text-[11px] font-medium text-[#666666]">
                     <span>{video.archiveCode || 'CINE-V'}</span>
                     <span>{getCategoryLabel(video.category, language)}</span>
                   </div>
@@ -346,7 +359,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       {video.description}
                     </p>
                   )}
-                  <div className="mt-4 flex items-center justify-between border-t border-[#1f1f1f] pt-3 text-[11px] font-mono-archive text-[#555555]">
+                  <div className="mt-4 flex items-center justify-between border-t border-[#1f1f1f] pt-3 text-[11px] text-[#555555]">
                     <span>{video.creationDate}</span>
                     <span>{video.client || t.home.independentArchive}</span>
                   </div>

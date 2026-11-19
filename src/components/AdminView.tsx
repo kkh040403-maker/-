@@ -726,13 +726,19 @@ export const AdminView: React.FC<AdminViewProps> = ({
                   LIVE PREVIEW
                 </div>
 
-                <div className="mt-4 aspect-[4/5] w-full overflow-hidden rounded-xs border border-[#262626] bg-[#0c0c0c]">
+                <div className="relative mt-4 aspect-[4/5] w-full overflow-hidden rounded-xs border border-[#262626] bg-[#0c0c0c] flex items-center justify-center p-2">
                   {photoForm.imageUrl ? (
-                    <img
-                      src={photoForm.imageUrl}
-                      alt="Preview"
-                      className="h-full w-full object-cover"
-                    />
+                    <>
+                      <div
+                        className="absolute inset-0 bg-cover bg-center blur-lg opacity-25 scale-110 pointer-events-none"
+                        style={{ backgroundImage: `url(${photoForm.imageUrl})` }}
+                      />
+                      <img
+                        src={photoForm.imageUrl}
+                        alt="Preview"
+                        className="relative z-10 max-h-full max-w-full w-auto h-auto object-contain shadow-lg"
+                      />
+                    </>
                   ) : (
                     <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-[#555555]">
                       <Image className="h-8 w-8 text-[#444444]" />

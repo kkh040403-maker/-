@@ -34,14 +34,14 @@ export const AboutView: React.FC<AboutViewProps> = ({
       >
         {/* Header Tag */}
         <div className="flex items-center justify-between border-b border-[#222222] pb-6">
-          <div className="flex items-center gap-2 text-xs font-mono-archive tracking-[0.25em] text-[#777777]">
+          <div className="flex items-center gap-2 text-xs font-medium tracking-wider text-[#777777]">
             <span>{t.aboutView.tag}</span>
           </div>
 
           {isAdmin && onGoToEditProfile && (
             <button
               onClick={onGoToEditProfile}
-              className="inline-flex items-center gap-1.5 border border-[#444444] bg-[#1a1a1a] px-3.5 py-1.5 text-xs font-mono-archive text-[#cccccc] hover:border-white hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 border border-[#444444] bg-[#1a1a1a] px-3.5 py-1.5 text-xs font-medium text-[#cccccc] hover:border-white hover:text-white transition-colors"
             >
               <Edit3 className="h-3.5 w-3.5" />
               <span>{t.aboutView.editProfile}</span>
@@ -54,10 +54,10 @@ export const AboutView: React.FC<AboutViewProps> = ({
           <h1 className="text-4xl font-extrabold font-display tracking-tight sm:text-6xl text-white">
             {profile.name}
           </h1>
-          <p className="mt-3 text-sm font-mono-archive tracking-widest text-[#999999] uppercase">
+          <p className="mt-3 text-sm font-medium tracking-wide text-[#999999] uppercase">
             {profile.title}
           </p>
-          <div className="mt-4 flex items-center gap-2 text-xs font-mono-archive text-[#666666]">
+          <div className="mt-4 flex items-center gap-2 text-xs text-[#666666]">
             <MapPin className="h-3.5 w-3.5" />
             <span>{t.aboutView.base}: {profile.location}</span>
           </div>
@@ -65,7 +65,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
 
         {/* Bio Section */}
         <div className="mt-12 border-t border-[#1f1f1f] pt-10">
-          <h2 className="text-xs font-mono-archive tracking-widest text-[#777777] uppercase">
+          <h2 className="text-xs font-medium tracking-wider text-[#777777] uppercase">
             {t.aboutView.philosophyTag}
           </h2>
           <p className="mt-6 text-base sm:text-lg leading-relaxed text-[#cccccc] whitespace-pre-line font-light">
@@ -77,18 +77,18 @@ export const AboutView: React.FC<AboutViewProps> = ({
         <div className="mt-16 grid grid-cols-1 gap-12 border-t border-[#1f1f1f] pt-12 md:grid-cols-2">
           {/* Disciplines */}
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono-archive tracking-widest text-[#777777] uppercase">
+            <div className="flex items-center gap-2 text-xs font-medium tracking-wider text-[#777777] uppercase">
               <Layers className="h-3.5 w-3.5 text-[#aaaaaa]" />
               <span>{t.aboutView.disciplinesTag}</span>
             </div>
-            <ul className="mt-6 space-y-3 font-mono-archive text-xs text-[#dddddd]">
+            <ul className="mt-6 space-y-3 text-xs text-[#dddddd]">
               {profile.disciplines.map((item, idx) => (
                 <li
                   key={idx}
                   className="flex items-center gap-3 border-b border-[#1a1a1a] pb-2.5"
                 >
-                  <span className="text-[#555555]">{(idx + 1).toString().padStart(2, '0')}.</span>
-                  <span>{item}</span>
+                  <span className="text-[#555555] font-medium">{(idx + 1).toString().padStart(2, '0')}.</span>
+                  <span className="font-medium">{item}</span>
                 </li>
               ))}
             </ul>
@@ -96,18 +96,18 @@ export const AboutView: React.FC<AboutViewProps> = ({
 
           {/* Software Suite */}
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono-archive tracking-widest text-[#777777] uppercase">
+            <div className="flex items-center gap-2 text-xs font-medium tracking-wider text-[#777777] uppercase">
               <Terminal className="h-3.5 w-3.5 text-[#aaaaaa]" />
               <span>{t.aboutView.workflowTag}</span>
             </div>
-            <ul className="mt-6 space-y-3 font-mono-archive text-xs text-[#dddddd]">
+            <ul className="mt-6 space-y-3 text-xs text-[#dddddd]">
               {profile.software.map((item, idx) => (
                 <li
                   key={idx}
                   className="flex items-center gap-3 border-b border-[#1a1a1a] pb-2.5"
                 >
-                  <span className="text-[#555555]">SYS_{idx + 1}</span>
-                  <span>{item}</span>
+                  <span className="text-[#555555] font-medium">SYS_{idx + 1}</span>
+                  <span className="font-medium">{item}</span>
                 </li>
               ))}
             </ul>
@@ -117,7 +117,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
         {/* Exhibitions & Chronicles */}
         {profile.exhibitions && profile.exhibitions.length > 0 && (
           <div className="mt-16 border-t border-[#1f1f1f] pt-12">
-            <div className="flex items-center gap-2 text-xs font-mono-archive tracking-widest text-[#777777] uppercase">
+            <div className="flex items-center gap-2 text-xs font-medium tracking-wider text-[#777777] uppercase">
               <Award className="h-3.5 w-3.5 text-[#aaaaaa]" />
               <span>{t.aboutView.exhibitionsTag}</span>
             </div>
@@ -128,13 +128,13 @@ export const AboutView: React.FC<AboutViewProps> = ({
                   key={idx}
                   className="grid grid-cols-1 gap-2 py-4 sm:grid-cols-12 sm:items-baseline"
                 >
-                  <div className="font-mono-archive text-xs text-[#777777] sm:col-span-2">
+                  <div className="text-xs font-medium text-[#777777] sm:col-span-2">
                     {ex.year}
                   </div>
                   <div className="text-sm font-medium text-white sm:col-span-6">
                     {ex.title}
                   </div>
-                  <div className="font-mono-archive text-xs text-[#999999] sm:col-span-4 sm:text-right">
+                  <div className="text-xs text-[#999999] sm:col-span-4 sm:text-right">
                     {ex.roleOrPlace}
                   </div>
                 </div>
@@ -145,7 +145,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
 
         {/* Contact & Inquiries Section */}
         <div className="mt-20 border-t border-[#222222] bg-[#141414] p-8 sm:p-12">
-          <div className="text-xs font-mono-archive tracking-widest text-[#777777] uppercase">
+          <div className="text-xs font-medium tracking-wider text-[#777777] uppercase">
             {t.aboutView.collabTag}
           </div>
           <h3 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">
@@ -157,14 +157,14 @@ export const AboutView: React.FC<AboutViewProps> = ({
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
             {/* Email display & copy */}
-            <div className="flex items-center justify-between rounded-xs border border-[#2a2a2a] bg-[#1a1a1a] px-4 py-3 font-mono-archive text-xs text-white sm:min-w-[320px]">
-              <span className="flex items-center gap-2">
+            <div className="flex items-center justify-between rounded-xs border border-[#2a2a2a] bg-[#1a1a1a] px-4 py-3 text-xs text-white sm:min-w-[320px]">
+              <span className="flex items-center gap-2 font-medium">
                 <Mail className="h-4 w-4 text-[#777777]" />
                 {profile.email}
               </span>
               <button
                 onClick={handleCopyEmail}
-                className="ml-4 flex items-center gap-1 text-[11px] text-[#aaaaaa] hover:text-white transition-colors"
+                className="ml-4 flex items-center gap-1 text-[11px] font-medium text-[#aaaaaa] hover:text-white transition-colors"
                 title="이메일 복사"
               >
                 {copied ? (
@@ -183,7 +183,7 @@ export const AboutView: React.FC<AboutViewProps> = ({
 
             <a
               href={`mailto:${profile.email}`}
-              className="inline-flex items-center justify-center gap-2 border border-white bg-white px-6 py-3 font-mono-archive text-xs font-semibold tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
+              className="inline-flex items-center justify-center gap-2 border border-white bg-white px-6 py-3 text-xs font-semibold tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
             >
               <span>{t.aboutView.sendEmail}</span>
               <ArrowUpRight className="h-3.5 w-3.5" />

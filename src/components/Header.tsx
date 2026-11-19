@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => handleNav('HOME')}
           className="group flex items-center text-left focus:outline-none"
         >
-          <span className="text-xl font-bold font-display tracking-[0.25em] text-white transition-opacity group-hover:opacity-80">
+          <span className="text-xl font-bold font-display tracking-widest text-white transition-opacity group-hover:opacity-80">
             PORTFOLIO
           </span>
         </button>
@@ -64,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={item.tab}
                 onClick={() => handleNav(item.tab)}
-                className={`relative py-1 text-xs font-medium tracking-[0.2em] transition-colors ${
+                className={`relative py-1 text-xs font-semibold tracking-wide transition-colors ${
                   isActive ? 'text-white' : 'text-[#888888] hover:text-[#cccccc]'
                 }`}
               >
@@ -80,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Desktop Admin & Logout Controls */}
         <div className="hidden items-center gap-3.5 md:flex">
           {/* Minimalist Language Switcher */}
-          <div className="flex items-center rounded-xs border border-[#2a2a2a] bg-[#141414] p-0.5 font-mono-archive text-[11px]">
+          <div className="flex items-center rounded-xs border border-[#2a2a2a] bg-[#141414] p-0.5 text-[11px] font-medium">
             <button
               onClick={() => setLanguage('ko')}
               className={`px-2.5 py-1 rounded-xs transition-all ${
@@ -107,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => handleNav('ADMIN')}
-            className={`flex items-center gap-2 rounded-xs border px-3.5 py-1.5 text-xs font-mono-archive tracking-wider transition-all ${
+            className={`flex items-center gap-2 rounded-xs border px-3.5 py-1.5 text-xs font-medium tracking-wide transition-all ${
               currentTab === 'ADMIN'
                 ? 'border-white bg-white text-black font-semibold'
                 : isAdmin
@@ -199,8 +199,8 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={item.tab}
                 onClick={() => handleNav(item.tab)}
-                className={`flex items-center justify-between text-left text-sm font-medium tracking-[0.2em] ${
-                  currentTab === item.tab ? 'text-white font-semibold' : 'text-[#888888]'
+                className={`flex items-center justify-between text-left text-sm font-semibold tracking-wide ${
+                  currentTab === item.tab ? 'text-white' : 'text-[#888888]'
                 }`}
               >
                 <span>{item.label}</span>
@@ -210,11 +210,11 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Mobile Language Switcher Row */}
             <div className="pt-4 border-t border-[#222222] flex items-center justify-between">
-              <span className="font-mono-archive text-xs text-[#777777] flex items-center gap-2">
+              <span className="text-xs font-medium text-[#777777] flex items-center gap-2">
                 <Globe className="h-3.5 w-3.5" />
                 LANGUAGE / 언어
               </span>
-              <div className="flex items-center rounded-xs border border-[#2a2a2a] bg-[#101010] p-0.5 font-mono-archive text-xs">
+              <div className="flex items-center rounded-xs border border-[#2a2a2a] bg-[#101010] p-0.5 text-xs font-medium">
                 <button
                   onClick={() => setLanguage('ko')}
                   className={`px-3 py-1 rounded-xs transition-all ${
@@ -242,7 +242,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="pt-2 border-t border-[#222222] space-y-3">
               <button
                 onClick={() => handleNav('ADMIN')}
-                className={`flex w-full items-center justify-between rounded-xs border px-4 py-3 text-xs font-mono-archive tracking-wider ${
+                className={`flex w-full items-center justify-between rounded-xs border px-4 py-3 text-xs font-medium tracking-wide ${
                   currentTab === 'ADMIN'
                     ? 'border-white bg-white text-black font-semibold'
                     : 'border-[#333333] bg-[#181818] text-[#cccccc]'
@@ -267,7 +267,7 @@ export const Header: React.FC<HeaderProps> = ({
               {isAdmin && (
                 <button
                   onClick={handleLogoutClick}
-                  className="flex w-full items-center justify-center gap-2 rounded-xs border border-red-900/40 bg-red-950/20 px-4 py-2.5 text-xs font-mono-archive tracking-wider text-red-300 hover:bg-red-900/40 transition-colors"
+                  className="flex w-full items-center justify-center gap-2 rounded-xs border border-red-900/40 bg-red-950/20 px-4 py-2.5 text-xs font-medium tracking-wide text-red-300 hover:bg-red-900/40 transition-colors"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   <span>{t.nav.logout}</span>

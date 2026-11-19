@@ -46,7 +46,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
             <p className="mt-4 max-w-md text-xs leading-relaxed text-[#888888]">
               {t.footer.archiveDesc}
             </p>
-            <div className="mt-6 flex items-center gap-4 text-xs font-mono-archive text-[#666666]">
+            <div className="mt-6 flex items-center gap-4 text-xs font-medium text-[#666666]">
               <span>SEOUL 37°33&apos;N 126°58&apos;E</span>
               <span>•</span>
               <span>{timeStr || 'LIVE ARCHIVE'}</span>
@@ -55,10 +55,10 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
 
           {/* Col 2: Navigation Index */}
           <div>
-            <h4 className="text-xs font-mono-archive uppercase tracking-widest text-[#aaaaaa]">
+            <h4 className="text-xs uppercase tracking-wider font-semibold text-[#aaaaaa]">
               Index
             </h4>
-            <ul className="mt-4 space-y-2.5 text-xs font-mono-archive">
+            <ul className="mt-4 space-y-2.5 text-xs">
               <li>
                 <button
                   onClick={() => onSelectTab('HOME')}
@@ -96,10 +96,10 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
 
           {/* Col 3: System & Admin */}
           <div>
-            <h4 className="text-xs font-mono-archive uppercase tracking-widest text-[#aaaaaa]">
+            <h4 className="text-xs uppercase tracking-wider font-semibold text-[#aaaaaa]">
               System
             </h4>
-            <ul className="mt-4 space-y-2.5 text-xs font-mono-archive">
+            <ul className="mt-4 space-y-2.5 text-xs">
               <li>
                 <button
                   onClick={() => onSelectTab('ADMIN')}
@@ -128,7 +128,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectTab, isAdmin }) => {
         </div>
 
         {/* Bottom copyright */}
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-[#1a1a1a] pt-8 text-[11px] font-mono-archive text-[#555555] sm:flex-row">
+        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-[#1a1a1a] pt-8 text-[11px] font-medium text-[#555555] sm:flex-row">
           <div>© {new Date().getFullYear()} DARK ARCHIVE. ALL RIGHTS RESERVED.</div>
           <div>MINIMALIST DIGITAL ARCHIVE PLATFORM</div>
         </div>

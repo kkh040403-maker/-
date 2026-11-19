@@ -40,7 +40,7 @@ export const VideoView: React.FC<VideoViewProps> = ({
         {/* Page Header */}
         <div className="flex flex-col justify-between gap-6 border-b border-[#222222] pb-8 md:flex-row md:items-end">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono-archive tracking-[0.25em] text-[#777777]">
+            <div className="flex items-center gap-2 text-xs font-medium tracking-wider text-[#777777]">
               <span>{t.videoView.tag}</span>
               <span>•</span>
               <span>{videos.length} {t.videoView.archivedReelsSuffix}</span>
@@ -56,7 +56,7 @@ export const VideoView: React.FC<VideoViewProps> = ({
           {isAdmin && onGoToUpload && (
             <button
               onClick={onGoToUpload}
-              className="inline-flex items-center gap-2 border border-white bg-white px-5 py-3 text-xs font-mono-archive font-semibold tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
+              className="inline-flex items-center gap-2 border border-white bg-white px-5 py-3 text-xs font-semibold tracking-wider text-black transition-all hover:bg-[#e4e4e7]"
             >
               <Plus className="h-4 w-4" />
               <span>{t.videoView.uploadBtn}</span>
@@ -66,7 +66,7 @@ export const VideoView: React.FC<VideoViewProps> = ({
 
         {/* Category Filter Tabs */}
         <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-[#1c1c1c] pb-6">
-          <div className="mr-3 flex items-center gap-1.5 text-xs font-mono-archive text-[#555555]">
+          <div className="mr-3 flex items-center gap-1.5 text-xs font-medium text-[#666666]">
             <Filter className="h-3.5 w-3.5" />
             <span>{t.videoView.genreLabel}:</span>
           </div>
@@ -81,7 +81,7 @@ export const VideoView: React.FC<VideoViewProps> = ({
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`rounded-xs px-3.5 py-1.5 text-xs font-mono-archive tracking-wider transition-all ${
+                className={`rounded-xs px-3.5 py-1.5 text-xs font-medium transition-all ${
                   isSelected
                     ? 'bg-white text-black font-semibold'
                     : 'bg-[#181818] text-[#888888] hover:bg-[#222222] hover:text-[#cccccc]'
@@ -150,12 +150,12 @@ export const VideoView: React.FC<VideoViewProps> = ({
                   {/* Corner Badges */}
                   <div className="absolute top-3 left-3 flex items-center gap-2">
                     {video.resolution && (
-                      <span className="rounded border border-white/20 bg-black/70 px-2 py-0.5 font-mono-archive text-[10px] text-[#cccccc] backdrop-blur-sm">
+                      <span className="rounded border border-white/20 bg-black/70 px-2 py-0.5 text-[10px] font-medium text-[#cccccc] backdrop-blur-sm">
                         {video.resolution}
                       </span>
                     )}
                     {video.duration && (
-                      <span className="rounded bg-black/70 px-2 py-0.5 font-mono-archive text-[10px] text-white backdrop-blur-sm">
+                      <span className="rounded bg-black/70 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
                         {video.duration}
                       </span>
                     )}
@@ -163,11 +163,11 @@ export const VideoView: React.FC<VideoViewProps> = ({
 
                   <div className="absolute top-3 right-3">
                     {video.isSample ? (
-                      <span className="rounded bg-black/60 px-2 py-0.5 font-mono-archive text-[10px] text-[#888888] backdrop-blur-sm">
+                      <span className="rounded bg-black/60 px-2 py-0.5 text-[10px] font-medium text-[#888888] backdrop-blur-sm">
                         {t.videoView.sampleBadge}
                       </span>
                     ) : (
-                      <span className="rounded border border-[#3b82f6]/40 bg-[#1e293b]/80 px-2 py-0.5 font-mono-archive text-[10px] text-[#93c5fd] backdrop-blur-sm">
+                      <span className="rounded border border-[#3b82f6]/40 bg-[#1e293b]/80 px-2 py-0.5 text-[10px] font-medium text-[#93c5fd] backdrop-blur-sm">
                         {t.videoView.originalBadge}
                       </span>
                     )}
@@ -176,7 +176,7 @@ export const VideoView: React.FC<VideoViewProps> = ({
 
                 {/* Video Info Section */}
                 <div className="p-6">
-                  <div className="flex items-center justify-between text-[11px] font-mono-archive text-[#666666]">
+                  <div className="flex items-center justify-between text-[11px] font-medium text-[#666666]">
                     <span>{video.archiveCode || 'CINE-V'}</span>
                     <span className="rounded bg-[#1c1c1c] px-2 py-0.5 text-[#999999]">
                       {getCategoryLabel(video.category, language)}
@@ -193,7 +193,7 @@ export const VideoView: React.FC<VideoViewProps> = ({
                     </p>
                   )}
 
-                  <div className="mt-5 flex items-center justify-between border-t border-[#1f1f1f] pt-3 text-[11px] font-mono-archive text-[#555555]">
+                  <div className="mt-5 flex items-center justify-between border-t border-[#1f1f1f] pt-3 text-[11px] text-[#555555]">
                     <span>{video.creationDate}</span>
                     <span className="text-[#888888]">
                       {video.client || 'DIRECT CINEMA'}
@@ -214,14 +214,14 @@ export const VideoView: React.FC<VideoViewProps> = ({
             {isAdmin && onGoToUpload ? (
               <button
                 onClick={onGoToUpload}
-                className="mt-6 border border-[#333333] bg-[#181818] px-5 py-2.5 text-xs font-mono-archive text-white hover:border-white"
+                className="mt-6 border border-[#333333] bg-[#181818] px-5 py-2.5 text-xs font-medium text-white hover:border-white"
               >
                 {t.videoView.uploadNewBtn}
               </button>
             ) : (
               <button
                 onClick={() => setSelectedCategory('ALL')}
-                className="mt-6 border border-[#333333] px-5 py-2 text-xs font-mono-archive text-[#aaaaaa] hover:text-white"
+                className="mt-6 border border-[#333333] px-5 py-2 text-xs font-medium text-[#aaaaaa] hover:text-white"
               >
                 {t.videoView.viewAllBtn}
               </button>
